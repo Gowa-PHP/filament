@@ -23,11 +23,13 @@ class RefreshStatusAction
 
                     if ($device) {
                         $statusStr = strtolower((string) ($device->status ?? ''));
-                        $statusEnum = GowaInstanceStatus::tryFrom($statusStr) ?? match ($statusStr) {
-                            'connected', 'open' => GowaInstanceStatus::Open,
-                            'disconnected', 'closed', 'close' => GowaInstanceStatus::Close,
-                            'connecting' => GowaInstanceStatus::Connecting,
-                            default => $record->status,
+
+                        $statusEnum = match (true) {
+                            $device->isPaired() || in_array($statusStr, ['logged_in', 'open', 'connected', 'authenticated', 'paired'], true) => GowaInstanceStatus::Open,
+                            in_array($statusStr, ['connecting', 'qr_pairing', 'code_pairing', 'login'], true) => GowaInstanceStatus::Connecting,
+                            in_array($statusStr, ['close', 'closed', 'disconnected', 'logged_out', 'logout'], true) => GowaInstanceStatus::Close,
+                            in_array($statusStr, ['created'], true) => GowaInstanceStatus::Created,
+                            default => GowaInstanceStatus::tryFrom($statusStr) ?? $record->status,
                         };
 
                         $dataToUpdate = [
@@ -35,6 +37,10 @@ class RefreshStatusAction
                             'name' => ! empty($device->name) ? $device->name : $record->name,
                             'phone_number' => $device->phone ?? $device->phoneNumber ?? $record->phone_number,
                         ];
+
+                        if ($statusEnum === GowaInstanceStatus::Open && empty($record->connected_at)) {
+                            $dataToUpdate['connected_at'] = now();
+                        }
 
                         if (! empty($device->jid)) {
                             $meta = $record->meta ?? [];
