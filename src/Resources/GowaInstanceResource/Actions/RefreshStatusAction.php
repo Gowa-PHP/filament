@@ -22,7 +22,7 @@ class RefreshStatusAction
                     $device = Gowa::device($deviceId);
 
                     if ($device) {
-                        $statusStr = strtolower((string) ($device->status ?? ''));
+                        $statusStr = strtolower((string) ($device->status ?? $device->raw['state'] ?? $device->raw['status'] ?? ''));
 
                         $statusEnum = match (true) {
                             $device->isPaired() || in_array($statusStr, ['logged_in', 'open', 'connected', 'authenticated', 'paired'], true) => GowaInstanceStatus::Open,
@@ -32,10 +32,13 @@ class RefreshStatusAction
                             default => GowaInstanceStatus::tryFrom($statusStr) ?? $record->status,
                         };
 
+                        $name = ! empty($device->name) ? $device->name : ($device->raw['display_name'] ?? $record->name);
+                        $phone = $device->phone ?? $device->phoneNumber ?? (is_string($device->jid ?? null) ? explode('@', $device->jid)[0] : $record->phone_number);
+
                         $dataToUpdate = [
                             'status' => $statusEnum,
-                            'name' => ! empty($device->name) ? $device->name : $record->name,
-                            'phone_number' => $device->phone ?? $device->phoneNumber ?? $record->phone_number,
+                            'name' => $name,
+                            'phone_number' => $phone,
                         ];
 
                         if ($statusEnum === GowaInstanceStatus::Open && empty($record->connected_at)) {
