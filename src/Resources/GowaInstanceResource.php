@@ -2,7 +2,6 @@
 
 namespace Gowa\Filament\Resources;
 
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -18,10 +17,7 @@ use Gowa\Filament\Resources\GowaInstanceResource\Actions\ConnectPairingCodeActio
 use Gowa\Filament\Resources\GowaInstanceResource\Actions\ConnectQrAction;
 use Gowa\Filament\Resources\GowaInstanceResource\Actions\DisconnectAction;
 use Gowa\Filament\Resources\GowaInstanceResource\Actions\RefreshStatusAction;
-use Gowa\Filament\Resources\GowaInstanceResource\Pages\CreateGowaInstance;
-use Gowa\Filament\Resources\GowaInstanceResource\Pages\EditGowaInstance;
 use Gowa\Filament\Resources\GowaInstanceResource\Pages\ListGowaInstances;
-use Gowa\Filament\Resources\GowaInstanceResource\Pages\ViewGowaInstance;
 use Gowa\Laravel\Enums\GowaInstanceStatus;
 
 class GowaInstanceResource extends Resource
@@ -84,17 +80,6 @@ class GowaInstanceResource extends Resource
                             ->label('WhatsApp JID')
                             ->placeholder('e.g. 5511999999999@s.whatsapp.net')
                             ->maxLength(255),
-
-                        Select::make('status')
-                            ->label('Status')
-                            ->options([
-                                GowaInstanceStatus::Open->value => __('gowa-filament::gowa-filament.status.connected'),
-                                GowaInstanceStatus::Connecting->value => __('gowa-filament::gowa-filament.status.connecting'),
-                                GowaInstanceStatus::Close->value => __('gowa-filament::gowa-filament.status.disconnected'),
-                                GowaInstanceStatus::Created->value => 'Created',
-                            ])
-                            ->default(GowaInstanceStatus::Close->value)
-                            ->required(),
                     ])->columns(2),
             ]);
     }
@@ -166,9 +151,6 @@ class GowaInstanceResource extends Resource
     {
         return [
             'index' => ListGowaInstances::route('/'),
-            'create' => CreateGowaInstance::route('/create'),
-            'view' => ViewGowaInstance::route('/{record}'),
-            'edit' => EditGowaInstance::route('/{record}/edit'),
         ];
     }
 }
