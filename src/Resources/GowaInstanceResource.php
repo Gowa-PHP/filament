@@ -56,30 +56,46 @@ class GowaInstanceResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Instance Information')
+                Section::make(__('gowa-filament::gowa-filament.fields.section_title'))
+                    ->description(__('gowa-filament::gowa-filament.fields.section_desc'))
+                    ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
                         TextInput::make('name')
-                            ->label('Name / Alias')
-                            ->placeholder('e.g. Sales WhatsApp')
+                            ->label(__('gowa-filament::gowa-filament.fields.name'))
+                            ->placeholder(__('gowa-filament::gowa-filament.fields.name_placeholder'))
+                            ->helperText(__('gowa-filament::gowa-filament.fields.name_helper'))
+                            ->prefixIcon('heroicon-o-tag')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->columnSpan(1),
 
                         TextInput::make('device_id')
-                            ->label('Device ID')
-                            ->placeholder('e.g. device_01')
+                            ->label(__('gowa-filament::gowa-filament.fields.device_id'))
+                            ->placeholder(__('gowa-filament::gowa-filament.fields.device_id_placeholder'))
+                            ->helperText(__('gowa-filament::gowa-filament.fields.device_id_helper'))
+                            ->prefixIcon('heroicon-o-cpu-chip')
                             ->required()
                             ->unique(ignoreRecord: true)
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->columnSpan(1),
 
                         TextInput::make('phone')
-                            ->label('Phone Number')
-                            ->placeholder('e.g. 5511999999999')
-                            ->maxLength(30),
+                            ->label(__('gowa-filament::gowa-filament.fields.phone'))
+                            ->placeholder(__('gowa-filament::gowa-filament.fields.phone_placeholder'))
+                            ->helperText(__('gowa-filament::gowa-filament.fields.phone_helper'))
+                            ->prefixIcon('heroicon-o-phone')
+                            ->tel()
+                            ->maxLength(30)
+                            ->columnSpan(1),
 
                         TextInput::make('jid')
-                            ->label('WhatsApp JID')
-                            ->placeholder('e.g. 5511999999999@s.whatsapp.net')
-                            ->maxLength(255),
+                            ->label(__('gowa-filament::gowa-filament.fields.jid'))
+                            ->placeholder(__('gowa-filament::gowa-filament.fields.jid_placeholder'))
+                            ->helperText(__('gowa-filament::gowa-filament.fields.jid_helper'))
+                            ->prefixIcon('heroicon-o-at-symbol')
+                            ->disabled()
+                            ->maxLength(255)
+                            ->columnSpan(1),
                     ])->columns(2),
             ]);
     }
@@ -89,19 +105,19 @@ class GowaInstanceResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Name')
+                    ->label(__('gowa-filament::gowa-filament.fields.name'))
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
 
                 TextColumn::make('device_id')
-                    ->label('Device ID')
+                    ->label(__('gowa-filament::gowa-filament.fields.device_id'))
                     ->searchable()
                     ->copyable()
                     ->fontFamily('mono'),
 
                 TextColumn::make('phone')
-                    ->label('Phone')
+                    ->label(__('gowa-filament::gowa-filament.fields.phone'))
                     ->searchable(),
 
                 TextColumn::make('status')
