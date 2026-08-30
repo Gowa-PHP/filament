@@ -99,7 +99,6 @@ class SendGowaMessageAction extends Action
         $schema[] = Textarea::make('message')
             ->label(__('gowa-filament::gowa-filament.fields.message'))
             ->placeholder('Digite sua mensagem de WhatsApp...')
-            ->prefixIcon('heroicon-o-chat-bubble-left-ellipsis')
             ->required()
             ->rows(3)
             ->default($this->resolveMessage($record));
