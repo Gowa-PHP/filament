@@ -5,6 +5,7 @@ namespace Gowa\Filament\Resources;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -139,19 +140,25 @@ class GowaInstanceResource extends Resource
                     ->sortable(),
             ])
             ->actions([
-                ConnectQrAction::make(),
-                ConnectPairingCodeAction::make(),
-                RefreshStatusAction::make(),
-                DisconnectAction::make(),
-                ViewAction::make()
-                    ->modalHeading(__('gowa-filament::gowa-filament.actions.view_heading'))
-                    ->modalDescription(__('gowa-filament::gowa-filament.actions.view_desc'))
-                    ->modalWidth(Width::Medium),
-                EditAction::make()
-                    ->modalHeading(__('gowa-filament::gowa-filament.actions.edit_heading'))
-                    ->modalDescription(__('gowa-filament::gowa-filament.actions.edit_desc'))
-                    ->modalWidth(Width::Medium),
-                DeleteAction::make(),
+                ConnectQrAction::make()
+                    ->visible(fn ($record): bool => ! ($record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true))),
+
+                ActionGroup::make([
+                    ConnectPairingCodeAction::make()
+                        ->hidden(fn ($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
+                    RefreshStatusAction::make(),
+                    DisconnectAction::make()
+                        ->visible(fn ($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
+                    ViewAction::make()
+                        ->modalHeading(__('gowa-filament::gowa-filament.actions.view_heading'))
+                        ->modalDescription(__('gowa-filament::gowa-filament.actions.view_desc'))
+                        ->modalWidth(Width::Medium),
+                    EditAction::make()
+                        ->modalHeading(__('gowa-filament::gowa-filament.actions.edit_heading'))
+                        ->modalDescription(__('gowa-filament::gowa-filament.actions.edit_desc'))
+                        ->modalWidth(Width::Medium),
+                    DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
