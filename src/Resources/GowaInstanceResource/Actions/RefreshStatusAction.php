@@ -4,7 +4,7 @@ namespace Gowa\Filament\Resources\GowaInstanceResource\Actions;
 
 use Exception;
 use Filament\Notifications\Notification;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Gowa\Laravel\Facades\Gowa;
 
 class RefreshStatusAction

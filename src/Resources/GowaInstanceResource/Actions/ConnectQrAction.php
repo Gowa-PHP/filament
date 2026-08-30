@@ -2,7 +2,7 @@
 
 namespace Gowa\Filament\Resources\GowaInstanceResource\Actions;
 
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Illuminate\Contracts\View\View;
 
 class ConnectQrAction
