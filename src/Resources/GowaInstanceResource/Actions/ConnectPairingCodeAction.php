@@ -14,7 +14,7 @@ class ConnectPairingCodeAction
             ->icon('heroicon-o-device-phone-mobile')
             ->color('primary')
             ->modalHeading(__('gowa-filament::gowa-filament.pairing.title'))
-            ->modalContent(fn ($record): View => view('gowa-filament::livewire.gowa-pairing-code', [
+            ->modalContent(fn ($record): View => view('gowa-filament::actions.connect-pairing-modal', [
                 'deviceId' => $record->device_id ?? (string) $record->getKey(),
             ]))
             ->modalSubmitAction(false)
