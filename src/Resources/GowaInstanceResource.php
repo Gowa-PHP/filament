@@ -4,13 +4,13 @@ namespace Gowa\Filament\Resources;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Enums\Operation;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -57,44 +57,39 @@ class GowaInstanceResource extends Resource
     {
         return $schema
             ->components([
-                Section::make(__('gowa-filament::gowa-filament.fields.section_title'))
-                    ->description(__('gowa-filament::gowa-filament.fields.section_desc'))
-                    ->icon('heroicon-o-chat-bubble-left-right')
-                    ->columnSpanFull()
-                    ->schema([
-                        TextInput::make('name')
-                            ->label(__('gowa-filament::gowa-filament.fields.name'))
-                            ->placeholder(__('gowa-filament::gowa-filament.fields.name_placeholder'))
-                            ->helperText(__('gowa-filament::gowa-filament.fields.name_helper'))
-                            ->prefixIcon('heroicon-o-tag')
-                            ->required()
-                            ->maxLength(255),
+                TextInput::make('name')
+                    ->label(__('gowa-filament::gowa-filament.fields.name'))
+                    ->placeholder(__('gowa-filament::gowa-filament.fields.name_placeholder'))
+                    ->helperText(__('gowa-filament::gowa-filament.fields.name_helper'))
+                    ->prefixIcon('heroicon-o-tag')
+                    ->required()
+                    ->maxLength(255),
 
-                        TextInput::make('device_id')
-                            ->label(__('gowa-filament::gowa-filament.fields.device_id'))
-                            ->placeholder(__('gowa-filament::gowa-filament.fields.device_id_placeholder'))
-                            ->helperText(__('gowa-filament::gowa-filament.fields.device_id_helper'))
-                            ->prefixIcon('heroicon-o-cpu-chip')
-                            ->required()
-                            ->unique(ignoreRecord: true)
-                            ->maxLength(255),
+                TextInput::make('phone')
+                    ->label(__('gowa-filament::gowa-filament.fields.phone'))
+                    ->placeholder(__('gowa-filament::gowa-filament.fields.phone_placeholder'))
+                    ->helperText(__('gowa-filament::gowa-filament.fields.phone_helper'))
+                    ->prefixIcon('heroicon-o-phone')
+                    ->tel()
+                    ->maxLength(30),
 
-                        TextInput::make('phone')
-                            ->label(__('gowa-filament::gowa-filament.fields.phone'))
-                            ->placeholder(__('gowa-filament::gowa-filament.fields.phone_placeholder'))
-                            ->helperText(__('gowa-filament::gowa-filament.fields.phone_helper'))
-                            ->prefixIcon('heroicon-o-phone')
-                            ->tel()
-                            ->maxLength(30),
+                TextInput::make('device_id')
+                    ->label(__('gowa-filament::gowa-filament.fields.device_id'))
+                    ->placeholder(__('gowa-filament::gowa-filament.fields.device_id_placeholder'))
+                    ->helperText(__('gowa-filament::gowa-filament.fields.device_id_helper'))
+                    ->prefixIcon('heroicon-o-cpu-chip')
+                    ->disabled()
+                    ->hiddenOn(Operation::Create)
+                    ->maxLength(255),
 
-                        TextInput::make('jid')
-                            ->label(__('gowa-filament::gowa-filament.fields.jid'))
-                            ->placeholder(__('gowa-filament::gowa-filament.fields.jid_placeholder'))
-                            ->helperText(__('gowa-filament::gowa-filament.fields.jid_helper'))
-                            ->prefixIcon('heroicon-o-at-symbol')
-                            ->disabled()
-                            ->maxLength(255),
-                    ])->columns(2),
+                TextInput::make('jid')
+                    ->label(__('gowa-filament::gowa-filament.fields.jid'))
+                    ->placeholder(__('gowa-filament::gowa-filament.fields.jid_placeholder'))
+                    ->helperText(__('gowa-filament::gowa-filament.fields.jid_helper'))
+                    ->prefixIcon('heroicon-o-at-symbol')
+                    ->disabled()
+                    ->hiddenOn(Operation::Create)
+                    ->maxLength(255),
             ]);
     }
 
@@ -150,8 +145,14 @@ class GowaInstanceResource extends Resource
                 ConnectPairingCodeAction::make(),
                 RefreshStatusAction::make(),
                 DisconnectAction::make(),
-                ViewAction::make()->modalWidth(Width::ThreeExtraLarge),
-                EditAction::make()->modalWidth(Width::ThreeExtraLarge),
+                ViewAction::make()
+                    ->modalHeading(__('gowa-filament::gowa-filament.actions.view_heading'))
+                    ->modalDescription(__('gowa-filament::gowa-filament.actions.view_desc'))
+                    ->modalWidth(Width::Large),
+                EditAction::make()
+                    ->modalHeading(__('gowa-filament::gowa-filament.actions.edit_heading'))
+                    ->modalDescription(__('gowa-filament::gowa-filament.actions.edit_desc'))
+                    ->modalWidth(Width::Large),
                 DeleteAction::make(),
             ])
             ->bulkActions([

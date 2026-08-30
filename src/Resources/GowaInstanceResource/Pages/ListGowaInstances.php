@@ -6,6 +6,7 @@ use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Enums\Width;
 use Gowa\Filament\Resources\GowaInstanceResource;
+use Illuminate\Support\Str;
 
 class ListGowaInstances extends ListRecords
 {
@@ -15,7 +16,16 @@ class ListGowaInstances extends ListRecords
     {
         return [
             CreateAction::make()
-                ->modalWidth(Width::ThreeExtraLarge),
+                ->modalHeading(__('gowa-filament::gowa-filament.actions.create_heading'))
+                ->modalDescription(__('gowa-filament::gowa-filament.actions.create_desc'))
+                ->modalWidth(Width::Large)
+                ->mutateFormDataUsing(function (array $data): array {
+                    if (empty($data['device_id'])) {
+                        $data['device_id'] = (string) Str::uuid7();
+                    }
+
+                    return $data;
+                }),
         ];
     }
 }
