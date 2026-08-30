@@ -11,6 +11,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Gowa\Filament\Resources\GowaInstanceResource\Actions\ConnectPairingCodeAction;
@@ -59,6 +60,7 @@ class GowaInstanceResource extends Resource
                 Section::make(__('gowa-filament::gowa-filament.fields.section_title'))
                     ->description(__('gowa-filament::gowa-filament.fields.section_desc'))
                     ->icon('heroicon-o-chat-bubble-left-right')
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('name')
                             ->label(__('gowa-filament::gowa-filament.fields.name'))
@@ -66,8 +68,7 @@ class GowaInstanceResource extends Resource
                             ->helperText(__('gowa-filament::gowa-filament.fields.name_helper'))
                             ->prefixIcon('heroicon-o-tag')
                             ->required()
-                            ->maxLength(255)
-                            ->columnSpan(1),
+                            ->maxLength(255),
 
                         TextInput::make('device_id')
                             ->label(__('gowa-filament::gowa-filament.fields.device_id'))
@@ -76,8 +77,7 @@ class GowaInstanceResource extends Resource
                             ->prefixIcon('heroicon-o-cpu-chip')
                             ->required()
                             ->unique(ignoreRecord: true)
-                            ->maxLength(255)
-                            ->columnSpan(1),
+                            ->maxLength(255),
 
                         TextInput::make('phone')
                             ->label(__('gowa-filament::gowa-filament.fields.phone'))
@@ -85,8 +85,7 @@ class GowaInstanceResource extends Resource
                             ->helperText(__('gowa-filament::gowa-filament.fields.phone_helper'))
                             ->prefixIcon('heroicon-o-phone')
                             ->tel()
-                            ->maxLength(30)
-                            ->columnSpan(1),
+                            ->maxLength(30),
 
                         TextInput::make('jid')
                             ->label(__('gowa-filament::gowa-filament.fields.jid'))
@@ -94,8 +93,7 @@ class GowaInstanceResource extends Resource
                             ->helperText(__('gowa-filament::gowa-filament.fields.jid_helper'))
                             ->prefixIcon('heroicon-o-at-symbol')
                             ->disabled()
-                            ->maxLength(255)
-                            ->columnSpan(1),
+                            ->maxLength(255),
                     ])->columns(2),
             ]);
     }
@@ -152,8 +150,8 @@ class GowaInstanceResource extends Resource
                 ConnectPairingCodeAction::make(),
                 RefreshStatusAction::make(),
                 DisconnectAction::make(),
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()->modalWidth(Width::ThreeExtraLarge),
+                EditAction::make()->modalWidth(Width::ThreeExtraLarge),
                 DeleteAction::make(),
             ])
             ->bulkActions([

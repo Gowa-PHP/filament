@@ -4,6 +4,7 @@ namespace Gowa\Filament\Resources\GowaInstanceResource\Pages;
 
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Enums\Width;
 use Gowa\Filament\Resources\GowaInstanceResource;
 
 class ListGowaInstances extends ListRecords
@@ -13,7 +14,8 @@ class ListGowaInstances extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->modalWidth(Width::ThreeExtraLarge),
         ];
     }
 }
