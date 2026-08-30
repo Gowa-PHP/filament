@@ -3,6 +3,7 @@
 namespace Gowa\Filament\Resources\GowaInstanceResource\Actions;
 
 use Filament\Actions\Action;
+use Filament\Support\Enums\Width;
 use Illuminate\Contracts\View\View;
 
 class ConnectPairingCodeAction
@@ -14,6 +15,7 @@ class ConnectPairingCodeAction
             ->icon('heroicon-o-device-phone-mobile')
             ->color('primary')
             ->modalHeading(__('gowa-filament::gowa-filament.pairing.title'))
+            ->modalWidth(Width::Small)
             ->modalContent(fn ($record): View => view('gowa-filament::actions.connect-pairing-modal', [
                 'deviceId' => $record->device_id ?? (string) $record->getKey(),
             ]))
