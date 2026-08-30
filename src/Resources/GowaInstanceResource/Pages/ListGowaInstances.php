@@ -6,6 +6,7 @@ use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Enums\Width;
 use Gowa\Filament\Resources\GowaInstanceResource;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class ListGowaInstances extends ListRecords
@@ -18,13 +19,16 @@ class ListGowaInstances extends ListRecords
             CreateAction::make()
                 ->modalHeading(__('gowa-filament::gowa-filament.actions.create_heading'))
                 ->modalDescription(__('gowa-filament::gowa-filament.actions.create_desc'))
-                ->modalWidth(Width::Large)
+                ->modalWidth(Width::Medium)
                 ->mutateFormDataUsing(function (array $data): array {
                     if (empty($data['device_id'])) {
                         $data['device_id'] = (string) Str::uuid7();
                     }
 
                     return $data;
+                })
+                ->after(function (Model $record, ListGowaInstances $livewire): void {
+                    $livewire->mountTableAction('connectQr', (string) $record->getKey());
                 }),
         ];
     }

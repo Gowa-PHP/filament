@@ -63,7 +63,8 @@ class GowaInstanceResource extends Resource
                     ->helperText(__('gowa-filament::gowa-filament.fields.name_helper'))
                     ->prefixIcon('heroicon-o-tag')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpanFull(),
 
                 TextInput::make('phone')
                     ->label(__('gowa-filament::gowa-filament.fields.phone'))
@@ -71,7 +72,8 @@ class GowaInstanceResource extends Resource
                     ->helperText(__('gowa-filament::gowa-filament.fields.phone_helper'))
                     ->prefixIcon('heroicon-o-phone')
                     ->tel()
-                    ->maxLength(30),
+                    ->maxLength(30)
+                    ->columnSpanFull(),
 
                 TextInput::make('device_id')
                     ->label(__('gowa-filament::gowa-filament.fields.device_id'))
@@ -80,7 +82,8 @@ class GowaInstanceResource extends Resource
                     ->prefixIcon('heroicon-o-cpu-chip')
                     ->disabled()
                     ->hiddenOn(Operation::Create)
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpanFull(),
 
                 TextInput::make('jid')
                     ->label(__('gowa-filament::gowa-filament.fields.jid'))
@@ -89,7 +92,8 @@ class GowaInstanceResource extends Resource
                     ->prefixIcon('heroicon-o-at-symbol')
                     ->disabled()
                     ->hiddenOn(Operation::Create)
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -148,11 +152,11 @@ class GowaInstanceResource extends Resource
                 ViewAction::make()
                     ->modalHeading(__('gowa-filament::gowa-filament.actions.view_heading'))
                     ->modalDescription(__('gowa-filament::gowa-filament.actions.view_desc'))
-                    ->modalWidth(Width::Large),
+                    ->modalWidth(Width::Medium),
                 EditAction::make()
                     ->modalHeading(__('gowa-filament::gowa-filament.actions.edit_heading'))
                     ->modalDescription(__('gowa-filament::gowa-filament.actions.edit_desc'))
-                    ->modalWidth(Width::Large),
+                    ->modalWidth(Width::Medium),
                 DeleteAction::make(),
             ])
             ->bulkActions([
