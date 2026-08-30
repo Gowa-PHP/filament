@@ -15,6 +15,7 @@ class GowaQrCode extends Component
     public ?string $qrCodeUrl = null;
     public string $status = 'connecting';
     public bool $isExpired = false;
+    public int $expiresAtTimestamp = 0;
     public ?string $errorMessage = null;
 
     public function getErrorBag(): MessageBagContract
@@ -53,6 +54,7 @@ class GowaQrCode extends Component
     {
         $this->errorMessage = null;
         $this->isExpired = false;
+        $this->expiresAtTimestamp = time() + 45;
 
         try {
             $pairing = Gowa::startQrPairing($this->deviceId);
@@ -83,6 +85,21 @@ class GowaQrCode extends Component
 
     public function checkStatus(): void
     {
+        if ($this->status === 'connected') {
+            return;
+        }
+
+        if ($this->isExpired) {
+            return;
+        }
+
+        if ($this->expiresAtTimestamp > 0 && time() >= $this->expiresAtTimestamp) {
+            $this->isExpired = true;
+            $this->qrCodeUrl = null;
+
+            return;
+        }
+
         try {
             $device = Gowa::device($this->deviceId);
 
