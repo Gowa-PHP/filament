@@ -20,6 +20,7 @@ class ListGowaInstances extends ListRecords
                 ->modalHeading(__('gowa-filament::gowa-filament.actions.create_heading'))
                 ->modalDescription(__('gowa-filament::gowa-filament.actions.create_desc'))
                 ->modalWidth(Width::Medium)
+                ->createAnother(false)
                 ->mutateFormDataUsing(function (array $data): array {
                     if (empty($data['device_id'])) {
                         $data['device_id'] = (string) Str::uuid7();
