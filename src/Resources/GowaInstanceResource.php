@@ -120,17 +120,21 @@ class GowaInstanceResource extends Resource
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string|GowaInstanceStatus $state): string => match ($state instanceof GowaInstanceStatus ? $state->value : $state) {
+                    ->color(fn (mixed $state): string => match ($state instanceof GowaInstanceStatus ? $state->value : (string) $state) {
                         'open', 'connected' => 'success',
                         'connecting' => 'warning',
                         'close', 'disconnected' => 'danger',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (string|GowaInstanceStatus $state): string => match ($state instanceof GowaInstanceStatus ? $state->value : $state) {
-                        'open', 'connected' => __('gowa-filament::gowa-filament.status.connected'),
-                        'connecting' => __('gowa-filament::gowa-filament.status.connecting'),
-                        'close', 'disconnected' => __('gowa-filament::gowa-filament.status.disconnected'),
-                        default => ucfirst((string) $state),
+                    ->formatStateUsing(function (mixed $state): string {
+                        $value = $state instanceof GowaInstanceStatus ? $state->value : (string) $state;
+
+                        return match ($value) {
+                            'open', 'connected' => __('gowa-filament::gowa-filament.status.connected'),
+                            'connecting' => __('gowa-filament::gowa-filament.status.connecting'),
+                            'close', 'disconnected' => __('gowa-filament::gowa-filament.status.disconnected'),
+                            default => ucfirst($value),
+                        };
                     }),
 
                 TextColumn::make('connected_at')
