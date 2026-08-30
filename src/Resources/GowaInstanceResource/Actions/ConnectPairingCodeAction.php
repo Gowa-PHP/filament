@@ -10,10 +10,10 @@ class ConnectPairingCodeAction
     public static function make(): Action
     {
         return Action::make('connectPairingCode')
-            ->label(__('gowa-filament::gowa-filament.actions.connect_code'))
+            ->label(__('gowa-filament::gowa-filament.actions.connect_pairing_code'))
             ->icon('heroicon-o-device-phone-mobile')
-            ->color('info')
-            ->modalTitle(__('gowa-filament::gowa-filament.pairing.title'))
+            ->color('primary')
+            ->modalHeading(__('gowa-filament::gowa-filament.pairing.title'))
             ->modalContent(fn ($record): View => view('gowa-filament::livewire.gowa-pairing-code', [
                 'deviceId' => $record->device_id ?? (string) $record->getKey(),
             ]))

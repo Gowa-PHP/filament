@@ -13,7 +13,7 @@ class ConnectQrAction
             ->label(__('gowa-filament::gowa-filament.actions.connect_qr'))
             ->icon('heroicon-o-qr-code')
             ->color('success')
-            ->modalTitle(__('gowa-filament::gowa-filament.qr.title'))
+            ->modalHeading(__('gowa-filament::gowa-filament.qr.title'))
             ->modalContent(fn ($record): View => view('gowa-filament::livewire.gowa-qr-code', [
                 'deviceId' => $record->device_id ?? (string) $record->getKey(),
             ]))
