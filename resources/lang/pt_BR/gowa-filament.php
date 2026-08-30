@@ -35,6 +35,7 @@ return [
         'view_desc' => 'Visualize todas as informações registradas desta instância.',
         'connect_qr' => 'Conectar via QR Code',
         'connect_code' => 'Conectar via Código',
+        'connect_pairing_code' => 'Conectar via Código de Pareamento',
         'disconnect' => 'Desconectar',
         'refresh_status' => 'Atualizar Status',
         'disconnect_confirm' => 'Tem certeza de que deseja desconectar este aparelho?',

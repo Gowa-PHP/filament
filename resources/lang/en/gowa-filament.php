@@ -35,6 +35,7 @@ return [
         'view_desc' => 'View all registered details for this instance.',
         'connect_qr' => 'Connect via QR Code',
         'connect_code' => 'Connect via Pairing Code',
+        'connect_pairing_code' => 'Connect via Pairing Code',
         'disconnect' => 'Disconnect',
         'refresh_status' => 'Refresh Status',
         'disconnect_confirm' => 'Are you sure you want to disconnect this device?',
