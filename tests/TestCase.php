@@ -59,10 +59,9 @@ abstract class TestCase extends Orchestra
             $table->id();
             $table->string('device_id')->unique();
             $table->string('name')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('jid')->nullable();
+            $table->string('phone_number')->nullable();
             $table->string('status')->default('close');
-            $table->json('metadata')->nullable();
+            $table->json('meta')->nullable();
             $table->timestamp('connected_at')->nullable();
             $table->timestamps();
         });

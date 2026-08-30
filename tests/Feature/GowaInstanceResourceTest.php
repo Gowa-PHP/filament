@@ -11,7 +11,7 @@ it('can query instances table', function () {
     GowaInstance::create([
         'device_id' => 'device_01',
         'name' => 'Sales WhatsApp',
-        'phone' => '5511999999999',
+        'phone_number' => '5511999999999',
         'status' => 'open',
     ]);
 

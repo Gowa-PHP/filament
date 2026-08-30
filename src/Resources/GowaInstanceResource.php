@@ -66,7 +66,7 @@ class GowaInstanceResource extends Resource
                     ->maxLength(255)
                     ->columnSpanFull(),
 
-                TextInput::make('phone')
+                TextInput::make('phone_number')
                     ->label(__('gowa-filament::gowa-filament.fields.phone'))
                     ->placeholder(__('gowa-filament::gowa-filament.fields.phone_placeholder'))
                     ->helperText(__('gowa-filament::gowa-filament.fields.phone_helper'))
@@ -113,7 +113,7 @@ class GowaInstanceResource extends Resource
                     ->copyable()
                     ->fontFamily('mono'),
 
-                TextColumn::make('phone')
+                TextColumn::make('phone_number')
                     ->label(__('gowa-filament::gowa-filament.fields.phone'))
                     ->searchable(),
 
