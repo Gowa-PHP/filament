@@ -57,8 +57,20 @@ class GowaQrCode extends Component
         try {
             $pairing = Gowa::startQrPairing($this->deviceId);
 
-            if ($pairing && $pairing->qrLink) {
-                $this->qrCodeUrl = $pairing->qrLink;
+            if ($pairing) {
+                $qr = $pairing->qrLink ?? (is_array($pairing->raw ?? null) ? ($pairing->raw['qr_link'] ?? $pairing->raw['qr'] ?? $pairing->raw['code'] ?? null) : null);
+
+                if (! empty($qr)) {
+                    if (str_starts_with($qr, 'data:image') || str_starts_with($qr, 'http://') || str_starts_with($qr, 'https://')) {
+                        $this->qrCodeUrl = $qr;
+                    } elseif (preg_match('%^[a-zA-Z0-9/+]*={0,2}$%', $qr) && strlen($qr) > 100) {
+                        $this->qrCodeUrl = 'data:image/png;base64,' . $qr;
+                    } else {
+                        $this->qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=' . urlencode($qr);
+                    }
+                } else {
+                    $this->qrCodeUrl = null;
+                }
             } else {
                 $this->qrCodeUrl = null;
             }

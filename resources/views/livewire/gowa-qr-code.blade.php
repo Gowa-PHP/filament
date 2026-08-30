@@ -11,9 +11,9 @@
             </h3>
         </div>
     @elseif($errorMessage)
-        <div class="p-4 rounded-lg bg-danger-50 dark:bg-danger-950 text-danger-600 dark:text-danger-400 text-sm max-w-md">
+        <div class="p-4 rounded-lg bg-danger-50 dark:bg-danger-950 text-danger-600 dark:text-danger-400 text-sm max-w-md text-left">
             <p class="font-semibold">{{ __('gowa-filament::gowa-filament.notifications.error_occurred') }}</p>
-            <p class="text-xs mt-1">{{ $errorMessage }}</p>
+            <p class="text-xs mt-1 font-mono break-all">{{ $errorMessage }}</p>
             <button type="button" wire:click="refreshQrCode" class="mt-3 px-3 py-1 bg-danger-600 text-white text-xs rounded hover:bg-danger-700">
                 {{ __('gowa-filament::gowa-filament.qr.refresh') }}
             </button>
@@ -47,10 +47,11 @@
         </div>
     @else
         <div class="flex flex-col items-center space-y-3 py-6">
-            <svg class="w-8 h-8 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24">
+            <svg class="w-8 h-8 animate-spin text-primary-600" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
+            <p class="text-xs text-gray-500">{{ __('gowa-filament::gowa-filament.qr.waiting') }}</p>
             <button type="button" wire:click="refreshQrCode" class="px-4 py-2 text-xs font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-500">
                 {{ __('gowa-filament::gowa-filament.qr.refresh') }}
             </button>
