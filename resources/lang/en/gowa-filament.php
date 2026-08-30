@@ -16,9 +16,9 @@ return [
         'phone' => 'Phone Number',
         'phone_placeholder' => 'e.g. 5511999999999',
         'phone_helper' => 'Phone number associated with WhatsApp account.',
-        'jid' => 'WhatsApp JID',
-        'jid_placeholder' => 'e.g. 5511999999999@s.whatsapp.net',
-        'jid_helper' => 'Technical protocol account identifier.',
+        'recipient_number' => 'Recipient Number',
+        'message' => 'Message',
+        'instance' => 'WhatsApp Instance',
     ],
     'status' => [
         'connected' => 'Connected',
@@ -38,11 +38,14 @@ return [
         'connect_pairing_code' => 'Connect via Pairing Code',
         'disconnect' => 'Disconnect',
         'refresh_status' => 'Refresh Status',
+        'send_message' => 'Send WhatsApp',
+        'send_test_message' => 'Send Test Message',
         'disconnect_confirm' => 'Are you sure you want to disconnect this device?',
     ],
     'notifications' => [
         'disconnected_success' => 'Device disconnected successfully.',
         'status_refreshed' => 'Device status refreshed.',
+        'message_sent' => 'WhatsApp message sent successfully!',
         'error_occurred' => 'An error occurred while communicating with the GOWA server.',
     ],
     'qr' => [

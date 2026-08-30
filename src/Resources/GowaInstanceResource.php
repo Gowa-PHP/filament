@@ -15,6 +15,7 @@ use Filament\Support\Enums\Operation;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Gowa\Filament\Actions\SendGowaMessageAction;
 use Gowa\Filament\Resources\GowaInstanceResource\Actions\ConnectPairingCodeAction;
 use Gowa\Filament\Resources\GowaInstanceResource\Actions\ConnectQrAction;
 use Gowa\Filament\Resources\GowaInstanceResource\Actions\DisconnectAction;
@@ -144,6 +145,13 @@ class GowaInstanceResource extends Resource
                     ->visible(fn ($record): bool => ! ($record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true))),
 
                 ActionGroup::make([
+                    SendGowaMessageAction::make('sendTestMessage')
+                        ->label(__('gowa-filament::gowa-filament.actions.send_test_message'))
+                        ->icon('heroicon-o-paper-airplane')
+                        ->color('primary')
+                        ->instanceFromRecord()
+                        ->visible(fn ($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
+
                     ConnectPairingCodeAction::make()
                         ->hidden(fn ($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
                     RefreshStatusAction::make(),

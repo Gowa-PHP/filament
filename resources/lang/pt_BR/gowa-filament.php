@@ -16,9 +16,9 @@ return [
         'phone' => 'Número de Telefone',
         'phone_placeholder' => 'Ex: 5511999999999',
         'phone_helper' => 'Número associado à conta do WhatsApp.',
-        'jid' => 'WhatsApp JID',
-        'jid_placeholder' => 'Ex: 5511999999999@s.whatsapp.net',
-        'jid_helper' => 'Identificador de conta no protocolo WhatsApp.',
+        'recipient_number' => 'Número do Destinatário',
+        'message' => 'Mensagem',
+        'instance' => 'Instância WhatsApp',
     ],
     'status' => [
         'connected' => 'Conectado',
@@ -38,11 +38,14 @@ return [
         'connect_pairing_code' => 'Conectar via Código de Pareamento',
         'disconnect' => 'Desconectar',
         'refresh_status' => 'Atualizar Status',
+        'send_message' => 'Enviar WhatsApp',
+        'send_test_message' => 'Testar Envio',
         'disconnect_confirm' => 'Tem certeza de que deseja desconectar este aparelho?',
     ],
     'notifications' => [
         'disconnected_success' => 'Dispositivo desconectado com sucesso.',
         'status_refreshed' => 'Status do dispositivo atualizado.',
+        'message_sent' => 'Mensagem de WhatsApp enviada com sucesso!',
         'error_occurred' => 'Ocorreu um erro ao comunicar com o servidor GOWA.',
     ],
     'qr' => [
