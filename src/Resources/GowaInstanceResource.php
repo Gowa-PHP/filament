@@ -84,16 +84,6 @@ class GowaInstanceResource extends Resource
                     ->hiddenOn(Operation::Create)
                     ->maxLength(255)
                     ->columnSpanFull(),
-
-                TextInput::make('jid')
-                    ->label(__('gowa-filament::gowa-filament.fields.jid'))
-                    ->placeholder(__('gowa-filament::gowa-filament.fields.jid_placeholder'))
-                    ->helperText(__('gowa-filament::gowa-filament.fields.jid_helper'))
-                    ->prefixIcon('heroicon-o-at-symbol')
-                    ->disabled()
-                    ->hiddenOn(Operation::Create)
-                    ->maxLength(255)
-                    ->columnSpanFull(),
             ]);
     }
 

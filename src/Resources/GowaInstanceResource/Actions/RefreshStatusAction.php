@@ -30,12 +30,19 @@ class RefreshStatusAction
                             default => $record->status,
                         };
 
-                        $record->update([
+                        $dataToUpdate = [
                             'status' => $statusEnum,
                             'name' => ! empty($device->name) ? $device->name : $record->name,
                             'phone_number' => $device->phone ?? $device->phoneNumber ?? $record->phone_number,
-                            'jid' => ! empty($device->jid) ? $device->jid : $record->jid,
-                        ]);
+                        ];
+
+                        if (! empty($device->jid)) {
+                            $meta = $record->meta ?? [];
+                            $meta['jid'] = $device->jid;
+                            $dataToUpdate['meta'] = $meta;
+                        }
+
+                        $record->update($dataToUpdate);
                     }
 
                     Notification::make()
