@@ -1,12 +1,33 @@
-# GOWA Filament Plugin 🚀
+<div align="center">
+  <img src="art/banner.png" alt="gowa-filament Banner" width="100%" max-width="800">
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/gowa-php/filament.svg?style=flat-square)](https://packagist.org/packages/gowa-php/filament)
-[![Total Downloads](https://img.shields.io/packagist/dt/gowa-php/filament.svg?style=flat-square)](https://packagist.org/packages/gowa-php/filament)
-[![License](https://img.shields.io/packagist/l/gowa-php/filament.svg?style=flat-square)](LICENSE)
+  # gowa-php/filament
 
-Official Filament plugin for integrating **GOWA** ([go-whatsapp-web-multidevice](https://github.com/aldinokemal/go-whatsapp-web-multidevice)) WhatsApp instances into Laravel Filament applications. 
+  **Filament v5 / v4 / v3 plugin for integrating GOWA WhatsApp instances into Laravel Filament applications**
 
-Connect instances via QR Code or 8-digit Pairing Code, send messages across 11 supported formats (Text, Images, Documents/PDFs, Audio/Voice, Contacts, Locations, Polls, etc.), and monitor connection states directly inside your Filament Panel.
+  [![Latest Version](https://img.shields.io/packagist/v/gowa-php/filament.svg?style=flat-square)](https://packagist.org/packages/gowa-php/filament)
+  [![Total Downloads](https://img.shields.io/packagist/dt/gowa-php/filament.svg?style=flat-square)](https://packagist.org/packages/gowa-php/filament)
+  [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
+  [![PHP Version](https://img.shields.io/badge/PHP-%3E%3D%208.2-777BB4.svg?style=flat-square)](https://php.net)
+  [![Laravel](https://img.shields.io/badge/Laravel-10%20|%2011%20|%2012-FF2D20.svg?style=flat-square)](https://laravel.com)
+  [![Filament](https://img.shields.io/badge/Filament-v3%20|%20v4%20|%20v5-FDAE4B.svg?style=flat-square)](https://filamentphp.com)
+
+</div>
+
+---
+
+> 🇧🇷 Para ler a documentação em Português, acesse [README.pt.md](README.pt.md).
+
+---
+
+## ⚡ Acknowledgments & Ecosystem Dependencies
+
+This package is Phase 3 of the GOWA PHP ecosystem and interacts with the open-source Go backend ecosystem:
+
+- **[whatsmeow](https://go.mau.fi/whatsmeow)** — The underlying Go library created by [Tulir Asokan](https://github.com/tulir) that reverse-engineers the WhatsApp Web Multi-Device WebSocket protocol and Signal encryption.
+- **[go-whatsapp-web-multidevice (GOWA)](https://github.com/aldinokemal/go-whatsapp-web-multidevice)** — The lightweight REST API wrapper created by [Aldino Kemal](https://github.com/aldinokemal) exposing `whatsmeow` over HTTP and Webhooks.
+- **[gowa-php/sdk](https://packagist.org/packages/gowa-php/sdk)** — Pure PHP SDK for GOWA REST API and Webhook parsing.
+- **[gowa-php/laravel](https://packagist.org/packages/gowa-php/laravel)** — Laravel integration providing Facades, Notification Channels, Webhook routes, and Eloquent models.
 
 ---
 
@@ -15,10 +36,7 @@ Connect instances via QR Code or 8-digit Pairing Code, send messages across 11 s
 * **PHP**: `>= 8.2`
 * **Laravel**: `^10.0 | ^11.0 | ^12.0`
 * **Filament**: `^5.0` (Tested & Verified) | `^3.0 | ^4.0` (Architectural Compatibility)
-* **GOWA Packages**: `gowa-php/sdk ^1.1`, `gowa-php/laravel ^1.1`
-
-> [!NOTE]
-> This package is currently **tested and verified on Filament v5**. Support for Filament v3 and v4 is maintained at the architecture level.
+* **GOWA Packages**: `gowa-php/sdk ^1.2`, `gowa-php/laravel ^1.2`
 
 ---
 
@@ -79,7 +97,8 @@ public function panel(Panel $panel): Panel
 
 ## ✨ Key Features
 
-- **📱 GOWA Instance Resource (`GowaInstanceResource`)**: View, create, and manage connected WhatsApp instances.
+- **📱 GOWA Instance Resource (`GowaInstanceResource`)**: View, create, edit, and manage connected WhatsApp instances with slide-over modals and native Filament Infolists.
+- **🔗 Webhook Synchronization & Secret Generator**: Synchronize webhook URLs and HMAC secrets directly with the GOWA Go server without disconnecting. Includes a 32-character random secret generator action.
 - **📷 Real-Time QR Code Modal**: Scan QR codes directly in Filament with automatic polling (`wire:poll.3s`).
 - **🔢 8-Digit Pairing Code Modal**: Link WhatsApp using a phone number with copy-to-clipboard pairing code.
 - **🧪 Messaging Test Sandbox (`GowaMessagingPage`)**: Interactive playground supporting all 11 GOWA message formats:
@@ -98,6 +117,7 @@ public function panel(Panel $panel): Panel
   - `SendGowaMessageAction`: Quick text messages with dynamic templates.
   - `SendGowaDocumentAction`: Send PDFs, invoices, contracts, or spreadsheets via file path or URL.
   - `SendGowaMediaAction`: Send images, videos, or audio with custom captions.
+  - `UpdateWebhookAction`: Instantly synchronize webhook URL and HMAC secret settings with GOWA backend.
 - **📊 Real-time Status Widget (`GowaDeviceStatusWidget`)**: Dashboard card displaying Connected, Connecting, and Offline instances.
 - **🌐 Multilingual Support**: Built-in English (`en`) and Portuguese (`pt_BR`) translations.
 
@@ -163,6 +183,16 @@ Run Pest PHP tests:
 ```bash
 composer test
 ```
+
+---
+
+## ⚠️ Disclaimer & Terms of Use
+
+This software is an open-source library created for **educational, research, and testing laboratory purposes**.
+
+- **Third-Party Terms of Service**: Users of this library are solely responsible for complying with WhatsApp's Terms of Service, Meta's Platform Policies, and the terms of any third-party services utilized.
+- **Automated Messaging & Policy Compliance**: Automated or unauthorized messaging may violate platform terms. Users must ensure strict compliance with applicable privacy laws (e.g., GDPR, LGPD), user consent requirements, and platform guidelines.
+- **No Warranty & Liability**: This software is provided "as is", without warranty of any kind, express or implied. The authors and contributors assume no liability for any account bans, data loss, service interruptions, or misuse of this library.
 
 ---
 
