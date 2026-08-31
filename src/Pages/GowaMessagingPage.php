@@ -182,6 +182,7 @@ class GowaMessagingPage extends Page implements HasForms
                             ->label(__('gowa-filament::gowa-filament.fields.media_file'))
                             ->directory('gowa-media')
                             ->visibility('public')
+                            ->maxSize(51200)
                             ->preserveFilenames()
                             ->imageEditor(fn ($get) => $get('message_type') === 'image')
                             ->acceptedFileTypes(fn ($get) => match ($get('message_type')) {
