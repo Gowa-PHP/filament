@@ -6,7 +6,6 @@ use Exception;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Gowa\Laravel\Facades\Gowa;
-use Illuminate\Support\Str;
 
 class UpdateWebhookAction
 {
@@ -20,16 +19,13 @@ class UpdateWebhookAction
                 try {
                     $deviceId = $record->device_id ?? (string) $record->getKey();
                     $webhookUrl = url(config('gowa.webhook.path', 'webhooks/gowa') . '/' . $deviceId);
-                    $webhookSecret = ! empty($record->webhook_secret) ? $record->webhook_secret : (config('gowa.webhook.secret') ?: Str::random(32));
 
-                    if (empty($record->webhook_secret)) {
-                        $record->update(['webhook_secret' => $webhookSecret]);
-                    }
+                    $record->update(['webhook_secret' => null]);
 
                     Gowa::updateWebhook(
                         deviceId: $deviceId,
                         webhookUrl: $webhookUrl,
-                        webhookSecret: $webhookSecret,
+                        webhookSecret: '',
                         events: ['message', 'message.ack', 'message.reaction', 'device.status']
                     );
 
