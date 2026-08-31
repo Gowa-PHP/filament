@@ -78,6 +78,7 @@ return [
         'disconnect' => 'Disconnect',
         'refresh_status' => 'Refresh Status',
         'send_message' => 'Send WhatsApp',
+        'send_notification' => 'Test Laravel Notification',
         'send_document' => 'Send WhatsApp Document',
         'send_media' => 'Send WhatsApp Media',
         'send_test_message' => 'Test Dispatch',

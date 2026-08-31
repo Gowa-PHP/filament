@@ -3,6 +3,7 @@
 use Gowa\Filament\Actions\SendGowaDocumentAction;
 use Gowa\Filament\Actions\SendGowaMediaAction;
 use Gowa\Filament\Actions\SendGowaMessageAction;
+use Gowa\Filament\Actions\SendGowaNotificationAction;
 use Gowa\Laravel\Facades\Gowa;
 use Gowa\Sdk\Dto\MediaPayload;
 use Gowa\Sdk\Dto\MediaType;
@@ -113,4 +114,31 @@ it('executes send media action via URL', function () {
         'media_url' => 'https://example.com/photo.jpg',
         'caption' => 'Receipt Photo',
     ], $dummyRecord);
+});
+
+it('instantiates and executes SendGowaNotificationAction', function () {
+    $client = Mockery::mock(GowaClient::class);
+    $client->shouldReceive('sendText')
+        ->with('device_test_01', '5511999999999', 'Notification Test Message', null)
+        ->once()
+        ->andReturn(new SentMessage(providerMessageId: 'msg_notif_01', raw: []));
+
+    Gowa::swap($client);
+
+    $dummyRecord = new class extends Model {
+        protected $attributes = [
+            'id' => 1,
+            'device_id' => 'device_test_01',
+            'phone_number' => '5511999999999',
+        ];
+    };
+
+    $action = SendGowaNotificationAction::make()
+        ->instanceFromRecord()
+        ->numberFrom('phone_number')
+        ->message('Notification Test Message');
+
+    expect($action->getName())->toBe('sendGowaNotification');
+
+    $action->executeSendNotification(['to' => '5511999999999', 'message' => 'Notification Test Message'], $dummyRecord);
 });
