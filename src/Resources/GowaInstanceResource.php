@@ -25,6 +25,7 @@ use Gowa\Filament\Resources\GowaInstanceResource\Actions\ConnectPairingCodeActio
 use Gowa\Filament\Resources\GowaInstanceResource\Actions\ConnectQrAction;
 use Gowa\Filament\Resources\GowaInstanceResource\Actions\DisconnectAction;
 use Gowa\Filament\Resources\GowaInstanceResource\Actions\RefreshStatusAction;
+use Gowa\Filament\Resources\GowaInstanceResource\Actions\UpdateWebhookAction;
 use Gowa\Filament\Resources\GowaInstanceResource\Pages\ListGowaInstances;
 use Gowa\Laravel\Enums\GowaInstanceStatus;
 
@@ -324,6 +325,7 @@ class GowaInstanceResource extends Resource
 
                     ConnectPairingCodeAction::make()
                         ->hidden(fn ($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
+                    UpdateWebhookAction::make(),
                     RefreshStatusAction::make(),
                     DisconnectAction::make()
                         ->visible(fn ($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
