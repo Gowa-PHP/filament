@@ -2,15 +2,19 @@
 
 namespace Gowa\Filament\Resources;
 
-use Filament\Forms\Components\TextInput;
-use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\Operation;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\ImageColumn;
@@ -97,6 +101,120 @@ class GowaInstanceResource extends Resource
                     ->hiddenOn(Operation::Create)
                     ->maxLength(255)
                     ->columnSpanFull(),
+            ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Section::make(__('gowa-filament::gowa-filament.actions.view_heading'))
+                    ->schema([
+                        Grid::make(3)
+                            ->schema([
+                                ImageEntry::make('avatar_url')
+                                    ->label('')
+                                    ->circular()
+                                    ->height(80)
+                                    ->width(80)
+                                    ->defaultImageUrl(fn ($record): string => 'https://ui-avatars.com/api/?name=' . urlencode($record->name ?? 'WA') . '&color=128C7E&background=DCF8C6')
+                                    ->getStateUsing(function ($record): ?string {
+                                        if (empty($record->phone_number) || empty($record->device_id)) {
+                                            return null;
+                                        }
+
+                                        return cache()->remember('gowa_avatar_' . $record->device_id, 86400, function () use ($record) {
+                                            try {
+                                                $avatar = \Gowa\Laravel\Facades\Gowa::avatar($record->device_id, $record->phone_number);
+                                                return $avatar?->url;
+                                            } catch (\Throwable $e) {
+                                                return null;
+                                            }
+                                        });
+                                    })
+                                    ->columnSpan(1),
+
+                                Grid::make(1)
+                                    ->schema([
+                                        TextEntry::make('name')
+                                            ->label(__('gowa-filament::gowa-filament.fields.name'))
+                                            ->weight('bold')
+                                            ->size('lg'),
+
+                                        TextEntry::make('official_name')
+                                            ->label('Perfil WhatsApp')
+                                            ->color('success')
+                                            ->getStateUsing(function ($record): ?string {
+                                                if (empty($record->device_id)) {
+                                                    return null;
+                                                }
+
+                                                return cache()->remember('gowa_device_name_' . $record->device_id, 3600, function () use ($record) {
+                                                    try {
+                                                        $device = \Gowa\Laravel\Facades\Gowa::device($record->device_id);
+                                                        return $device?->name ?: null;
+                                                    } catch (\Throwable $e) {
+                                                        return null;
+                                                    }
+                                                });
+                                            }),
+                                    ])
+                                    ->columnSpan(2),
+                            ]),
+                    ]),
+
+                Section::make('Informações de Conexão')
+                    ->schema([
+                        TextEntry::make('status')
+                            ->label('Status da Conexão')
+                            ->badge()
+                            ->color(fn (mixed $state): string => match ($state instanceof GowaInstanceStatus ? $state->value : (string) $state) {
+                                'open', 'connected' => 'success',
+                                'connecting' => 'warning',
+                                'close', 'disconnected' => 'danger',
+                                default => 'gray',
+                            })
+                            ->formatStateUsing(function (mixed $state): string {
+                                $value = $state instanceof GowaInstanceStatus ? $state->value : (string) $state;
+
+                                return match ($value) {
+                                    'open', 'connected' => __('gowa-filament::gowa-filament.status.connected'),
+                                    'connecting' => __('gowa-filament::gowa-filament.status.connecting'),
+                                    'close', 'disconnected' => __('gowa-filament::gowa-filament.status.disconnected'),
+                                    default => ucfirst($value),
+                                };
+                            }),
+
+                        TextEntry::make('phone_number')
+                            ->label(__('gowa-filament::gowa-filament.fields.phone'))
+                            ->icon('heroicon-o-phone')
+                            ->placeholder('Nenhum telefone registrado'),
+
+                        TextEntry::make('device_id')
+                            ->label(__('gowa-filament::gowa-filament.fields.device_id'))
+                            ->fontFamily('mono')
+                            ->copyable()
+                            ->icon('heroicon-o-cpu-chip'),
+
+                        TextEntry::make('webhook_url')
+                            ->label(__('gowa-filament::gowa-filament.fields.webhook_url'))
+                            ->fontFamily('mono')
+                            ->copyable()
+                            ->icon('heroicon-o-link')
+                            ->getStateUsing(fn ($record): string => url(config('gowa.webhook.path', 'webhooks/gowa') . '/' . $record->device_id)),
+
+                        Grid::make(2)
+                            ->schema([
+                                TextEntry::make('connected_at')
+                                    ->label('Conectado em')
+                                    ->dateTime()
+                                    ->placeholder('Nunca'),
+
+                                TextEntry::make('updated_at')
+                                    ->label('Última Atividade')
+                                    ->dateTime(),
+                            ]),
+                    ]),
             ]);
     }
 
@@ -199,7 +317,6 @@ class GowaInstanceResource extends Resource
                         ->slideOver()
                         ->modalHeading(__('gowa-filament::gowa-filament.actions.view_heading'))
                         ->modalDescription(__('gowa-filament::gowa-filament.actions.view_desc'))
-                        ->modalContent(fn ($record) => view('gowa-filament::actions.instance-details', ['record' => $record]))
                         ->modalWidth(Width::Medium),
                     EditAction::make()
                         ->slideOver()
