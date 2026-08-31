@@ -2,9 +2,18 @@
 
 namespace Gowa\Filament\Tests;
 
+use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
+use BladeUI\Icons\BladeIconsServiceProvider;
+use Filament\Actions\ActionsServiceProvider;
+use Filament\Facades\Filament;
 use Filament\FilamentServiceProvider;
+use Filament\Forms\FormsServiceProvider;
+use Filament\Notifications\NotificationsServiceProvider;
+use Filament\Panel;
 use Filament\Support\SupportServiceProvider;
+use Filament\Widgets\WidgetsServiceProvider;
 use Gowa\Filament\GowaFilamentServiceProvider;
+use Gowa\Filament\GowaPlugin;
 use Gowa\Laravel\GowaServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Livewire\Features\SupportTesting\SupportTesting;
@@ -21,6 +30,15 @@ abstract class TestCase extends Orchestra
             app('livewire')->componentHook(SupportTesting::class);
         }
 
+        $panel = Panel::make()
+            ->default()
+            ->id('admin')
+            ->path('admin')
+            ->plugin(GowaPlugin::make());
+
+        Filament::setCurrentPanel($panel);
+        Filament::registerPanel($panel);
+
         $this->setUpDatabase($this->app);
     }
 
@@ -28,7 +46,13 @@ abstract class TestCase extends Orchestra
     {
         return [
             LivewireServiceProvider::class,
+            BladeIconsServiceProvider::class,
+            BladeHeroiconsServiceProvider::class,
             SupportServiceProvider::class,
+            FormsServiceProvider::class,
+            ActionsServiceProvider::class,
+            NotificationsServiceProvider::class,
+            WidgetsServiceProvider::class,
             FilamentServiceProvider::class,
             GowaServiceProvider::class,
             GowaFilamentServiceProvider::class,
