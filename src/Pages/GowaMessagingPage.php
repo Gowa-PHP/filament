@@ -396,7 +396,7 @@ class GowaMessagingPage extends Page implements HasForms
                 'contact' => Gowa::sendContacts(
                     $deviceId,
                     $to,
-                    new ContactCard(name: (string) $data['contact_name'], phone: (string) $data['contact_phone'])
+                    new ContactCard(name: (string) $data['contact_name'], phones: [['phone' => (string) $data['contact_phone']]])
                 ),
 
                 'location' => Gowa::sendLocation(
