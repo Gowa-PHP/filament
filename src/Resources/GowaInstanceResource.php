@@ -196,10 +196,13 @@ class GowaInstanceResource extends Resource
                     DisconnectAction::make()
                         ->visible(fn ($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
                     ViewAction::make()
+                        ->slideOver()
                         ->modalHeading(__('gowa-filament::gowa-filament.actions.view_heading'))
                         ->modalDescription(__('gowa-filament::gowa-filament.actions.view_desc'))
+                        ->modalContent(fn ($record) => view('gowa-filament::actions.instance-details', ['record' => $record]))
                         ->modalWidth(Width::Medium),
                     EditAction::make()
+                        ->slideOver()
                         ->modalHeading(__('gowa-filament::gowa-filament.actions.edit_heading'))
                         ->modalDescription(__('gowa-filament::gowa-filament.actions.edit_desc'))
                         ->modalWidth(Width::Medium),
