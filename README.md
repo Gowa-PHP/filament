@@ -4,7 +4,9 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/gowa-php/filament.svg?style=flat-square)](https://packagist.org/packages/gowa-php/filament)
 [![License](https://img.shields.io/packagist/l/gowa-php/filament.svg?style=flat-square)](LICENSE)
 
-Official Filament v5 (and v4 / v3) plugin for managing **GOWA** ([go-whatsapp-web-multidevice](https://github.com/aldinokemal/go-whatsapp-web-multidevice)) WhatsApp instances, connecting via QR Code or 8-digit Pairing Code, and monitoring device connection states directly inside your Filament Panel.
+Official Filament plugin for integrating **GOWA** ([go-whatsapp-web-multidevice](https://github.com/aldinokemal/go-whatsapp-web-multidevice)) WhatsApp instances into Laravel Filament applications. 
+
+Connect instances via QR Code or 8-digit Pairing Code, send messages across 11 supported formats (Text, Images, Documents/PDFs, Audio/Voice, Contacts, Locations, Polls, etc.), and monitor connection states directly inside your Filament Panel.
 
 ---
 
@@ -12,8 +14,11 @@ Official Filament v5 (and v4 / v3) plugin for managing **GOWA** ([go-whatsapp-we
 
 * **PHP**: `>= 8.2`
 * **Laravel**: `^10.0 | ^11.0 | ^12.0`
-* **Filament**: `^3.0 | ^4.0 | ^5.0`
-* **GOWA Laravel Package**: `gowa-php/laravel ^1.0`
+* **Filament**: `^5.0` (Tested & Verified) | `^3.0 | ^4.0` (Architectural Compatibility)
+* **GOWA Packages**: `gowa-php/sdk ^1.0`, `gowa-php/laravel ^1.0`
+
+> [!NOTE]
+> This package is currently **tested and verified on Filament v5**. Support for Filament v3 and v4 is maintained at the architecture level.
 
 ---
 
@@ -54,20 +59,52 @@ public function panel(Panel $panel): Panel
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-- **📱 GOWA Instance Resource**: View, create, and manage connected WhatsApp devices inside Filament.
-- **📷 QR Code Modal & Real-time Polling**: Scan QR codes directly in Filament with automatic status updates (`wire:poll.3s`).
-- **🔢 8-Digit Pairing Code**: Link WhatsApp using a phone number with copy-to-clipboard pairing code.
-- **📊 Status Widget**: Filament StatsOverview widget tracking Connected, Connecting, and Disconnected instances in real-time.
-- **🔌 Disconnect & Refresh Actions**: Disconnect active devices or force-refresh statuses directly from Filament tables.
-- **🌐 Multilingual Support**: Built-in English and Portuguese (pt_BR) translations.
+- **📱 GOWA Instance Resource (`GowaInstanceResource`)**: View, create, and manage connected WhatsApp instances.
+- **📷 Real-Time QR Code Modal**: Scan QR codes directly in Filament with automatic polling (`wire:poll.3s`).
+- **🔢 8-Digit Pairing Code Modal**: Link WhatsApp using a phone number with copy-to-clipboard pairing code.
+- **🧪 Messaging Test Sandbox (`GowaMessagingPage`)**: Interactive playground supporting all 11 GOWA message formats:
+  - 💬 **Text**: Plain text messages with reply targeting.
+  - 🖼️ **Image**: Image upload with native Filament Image Editor (crop, rotate, flip).
+  - 🎥 **Video**: Video file uploads (`.mp4`, `.avi`, `.mov`).
+  - 📄 **Document / File**: Upload PDFs, CSVs, DOCX, XLSX, ZIP archives up to 50MB.
+  - 🎙️ **Audio / Voice Note**: Send audio files or simulate voice notes (PTT).
+  - 🏷️ **Sticker**: Send WebP/PNG stickers.
+  - 👤 **Contact Card**: Share WhatsApp contact cards.
+  - 📍 **Location**: Share GPS coordinates with location names and addresses.
+  - 🔗 **Link Preview**: Send links with automated open-graph previews.
+  - 📊 **Poll**: Interactive multi-option voting polls.
+  - 📡 **Presence Status**: Update typing (`composing`) or recording (`recording`) status.
+- **✉️ Custom Table & Form Action (`SendGowaMessageAction`)**: Trigger WhatsApp modal actions directly from any Filament Resource.
+- **📊 Real-time Status Widget (`GowaDeviceStatusWidget`)**: Dashboard card displaying Connected, Connecting, and Offline instances.
+- **🌐 Multilingual Support**: Built-in English (`en`) and Portuguese (`pt_BR`) translations.
+
+---
+
+## 💡 Usage Examples
+
+### 1. Adding `SendGowaMessageAction` to a Resource Table
+
+```php
+use Gowa\Filament\Actions\SendGowaMessageAction;
+
+public static function table(Table $table): Table
+{
+    return $table
+        ->columns([ ... ])
+        ->actions([
+            SendGowaMessageAction::make()
+                ->numberFrom('phone_number'), // Resolves phone from record
+        ]);
+}
+```
 
 ---
 
 ## 🧪 Testing
 
-Run Pest tests:
+Run Pest PHP tests:
 
 ```bash
 composer test
