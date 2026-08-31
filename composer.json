@@ -9,28 +9,12 @@
             "email": "aguinaldo.tupy@gmail.com"
         }
     ],
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../gowa-php",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "../gowa-laravel",
-            "options": {
-                "symlink": true
-            }
-        }
-    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
         "php": "^8.2",
-        "gowa-php/sdk": "*@dev",
-        "gowa-php/laravel": "*@dev",
+        "gowa-php/sdk": "^1.1",
+        "gowa-php/laravel": "^1.1",
         "filament/filament": "^3.0|^4.0|^5.0",
         "illuminate/contracts": "^10.0|^11.0|^12.0",
         "illuminate/support": "^10.0|^11.0|^12.0"
