@@ -135,13 +135,6 @@ class GowaInstanceResource extends Resource
                     ->copyable()
                     ->fontFamily('mono'),
 
-                TextColumn::make('webhook_url')
-                    ->label(__('gowa-filament::gowa-filament.fields.webhook_url'))
-                    ->getStateUsing(fn ($record): string => url(config('gowa.webhook.path', 'webhooks/gowa') . '/' . $record->device_id))
-                    ->copyable()
-                    ->fontFamily('mono')
-                    ->toggleable(isToggledHiddenByDefault: false),
-
                 TextColumn::make('phone_number')
                     ->label(__('gowa-filament::gowa-filament.fields.phone'))
                     ->searchable(),
