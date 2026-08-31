@@ -99,6 +99,7 @@ class GowaInstanceResource extends Resource
                     ->prefixIcon('heroicon-o-link')
                     ->formatStateUsing(fn ($record): ?string => $record ? url(config('gowa.webhook.path', 'webhooks/gowa') . '/' . $record->device_id) : null)
                     ->readOnly()
+                    ->dehydrated(false)
                     ->hiddenOn(Operation::Create)
                     ->maxLength(255)
                     ->columnSpanFull(),
