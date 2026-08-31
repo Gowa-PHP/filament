@@ -9,6 +9,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
@@ -28,6 +29,7 @@ use Gowa\Filament\Resources\GowaInstanceResource\Actions\RefreshStatusAction;
 use Gowa\Filament\Resources\GowaInstanceResource\Actions\UpdateWebhookAction;
 use Gowa\Filament\Resources\GowaInstanceResource\Pages\ListGowaInstances;
 use Gowa\Laravel\Enums\GowaInstanceStatus;
+use Illuminate\Database\Eloquent\Model;
 
 class GowaInstanceResource extends Resource
 {
@@ -65,44 +67,61 @@ class GowaInstanceResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->label(__('gowa-filament::gowa-filament.fields.name'))
-                    ->placeholder(__('gowa-filament::gowa-filament.fields.name_placeholder'))
-                    ->helperText(__('gowa-filament::gowa-filament.fields.name_helper'))
-                    ->prefixIcon('heroicon-o-tag')
-                    ->required()
-                    ->maxLength(255)
-                    ->columnSpanFull(),
+                Section::make('Informações Principais')
+                    ->columnSpanFull()
+                    ->schema([
+                        TextInput::make('name')
+                            ->label(__('gowa-filament::gowa-filament.fields.name'))
+                            ->placeholder(__('gowa-filament::gowa-filament.fields.name_placeholder'))
+                            ->helperText(__('gowa-filament::gowa-filament.fields.name_helper'))
+                            ->prefixIcon('heroicon-o-tag')
+                            ->required()
+                            ->maxLength(255),
 
-                TextInput::make('phone_number')
-                    ->label(__('gowa-filament::gowa-filament.fields.phone'))
-                    ->placeholder(__('gowa-filament::gowa-filament.fields.phone_placeholder'))
-                    ->helperText(__('gowa-filament::gowa-filament.fields.phone_helper'))
-                    ->prefixIcon('heroicon-o-phone')
-                    ->tel()
-                    ->maxLength(30)
-                    ->columnSpanFull(),
+                        TextInput::make('phone_number')
+                            ->label(__('gowa-filament::gowa-filament.fields.phone'))
+                            ->placeholder(__('gowa-filament::gowa-filament.fields.phone_placeholder'))
+                            ->helperText(__('gowa-filament::gowa-filament.fields.phone_helper'))
+                            ->prefixIcon('heroicon-o-phone')
+                            ->tel()
+                            ->maxLength(30),
 
-                TextInput::make('device_id')
-                    ->label(__('gowa-filament::gowa-filament.fields.device_id'))
-                    ->placeholder(__('gowa-filament::gowa-filament.fields.device_id_placeholder'))
-                    ->helperText(__('gowa-filament::gowa-filament.fields.device_id_helper'))
-                    ->prefixIcon('heroicon-o-cpu-chip')
-                    ->disabled()
-                    ->hiddenOn(Operation::Create)
-                    ->maxLength(255)
-                    ->columnSpanFull(),
+                        TextInput::make('device_id')
+                            ->label(__('gowa-filament::gowa-filament.fields.device_id'))
+                            ->placeholder(__('gowa-filament::gowa-filament.fields.device_id_placeholder'))
+                            ->helperText(__('gowa-filament::gowa-filament.fields.device_id_helper'))
+                            ->prefixIcon('heroicon-o-cpu-chip')
+                            ->disabled()
+                            ->hiddenOn(Operation::Create)
+                            ->maxLength(255),
+                    ]),
 
-                TextInput::make('webhook_url')
-                    ->label(__('gowa-filament::gowa-filament.fields.webhook_url'))
-                    ->helperText(__('gowa-filament::gowa-filament.fields.webhook_url_helper'))
-                    ->prefixIcon('heroicon-o-link')
-                    ->formatStateUsing(fn ($record): ?string => $record ? url(config('gowa.webhook.path', 'webhooks/gowa') . '/' . $record->device_id) : null)
-                    ->readOnly()
-                    ->dehydrated(false)
-                    ->hiddenOn(Operation::Create)
-                    ->maxLength(255)
-                    ->columnSpanFull(),
+                Section::make('Configurações do Webhook')
+                    ->columnSpanFull()
+                    ->schema([
+                        TextInput::make('webhook_url')
+                            ->label(__('gowa-filament::gowa-filament.fields.webhook_url'))
+                            ->helperText(__('gowa-filament::gowa-filament.fields.webhook_url_helper'))
+                            ->prefixIcon('heroicon-o-link')
+                            ->formatStateUsing(fn ($record): ?string => $record ? url(config('gowa.webhook.path', 'webhooks/gowa') . '/' . $record->device_id) : null)
+                            ->readOnly()
+                            ->dehydrated(false)
+                            ->hiddenOn(Operation::Create)
+                            ->maxLength(255),
+
+                        TextInput::make('webhook_secret')
+                            ->label('Segredo do Webhook (HMAC Secret)')
+                            ->placeholder('Deixe em branco para desativar assinatura HMAC')
+                            ->helperText('Chave HMAC SHA-256 enviada no cabeçalho X-Gowa-Signature')
+                            ->prefixIcon('heroicon-o-key')
+                            ->password()
+                            ->revealable()
+                            ->maxLength(255),
+
+                        Toggle::make('meta.webhook_insecure_skip_verify')
+                            ->label('Ignorar validação SSL/TLS (Insecure Skip Verify)')
+                            ->helperText('Ative para aceitar certificados SSL autoassinados ou não confiáveis no servidor webhook.'),
+                    ]),
             ]);
     }
 
@@ -339,7 +358,24 @@ class GowaInstanceResource extends Resource
                         ->slideOver()
                         ->modalHeading(__('gowa-filament::gowa-filament.actions.edit_heading'))
                         ->modalDescription(__('gowa-filament::gowa-filament.actions.edit_desc'))
-                        ->modalWidth(Width::Large),
+                        ->modalWidth(Width::Large)
+                        ->after(function (Model $record): void {
+                            try {
+                                $deviceId = $record->device_id ?? (string) $record->getKey();
+                                $webhookUrl = url(config('gowa.webhook.path', 'webhooks/gowa') . '/' . $deviceId);
+                                $insecureSkipVerify = (bool) ($record->meta['webhook_insecure_skip_verify'] ?? false);
+
+                                \Gowa\Laravel\Facades\Gowa::updateWebhook(
+                                    deviceId: $deviceId,
+                                    webhookUrl: $webhookUrl,
+                                    webhookSecret: $record->webhook_secret ?? '',
+                                    events: ['message', 'message.ack', 'message.reaction', 'device.status'],
+                                    insecureSkipVerify: $insecureSkipVerify
+                                );
+                            } catch (\Throwable $e) {
+                                // Silently handle sync failure
+                            }
+                        }),
                     DeleteAction::make(),
                 ]),
             ])

@@ -19,14 +19,14 @@ class UpdateWebhookAction
                 try {
                     $deviceId = $record->device_id ?? (string) $record->getKey();
                     $webhookUrl = url(config('gowa.webhook.path', 'webhooks/gowa') . '/' . $deviceId);
-
-                    $record->update(['webhook_secret' => null]);
+                    $insecureSkipVerify = (bool) ($record->meta['webhook_insecure_skip_verify'] ?? false);
 
                     Gowa::updateWebhook(
                         deviceId: $deviceId,
                         webhookUrl: $webhookUrl,
-                        webhookSecret: '',
-                        events: ['message', 'message.ack', 'message.reaction', 'device.status']
+                        webhookSecret: $record->webhook_secret ?? '',
+                        events: ['message', 'message.ack', 'message.reaction', 'device.status'],
+                        insecureSkipVerify: $insecureSkipVerify
                     );
 
                     Notification::make()
