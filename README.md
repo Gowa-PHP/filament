@@ -38,6 +38,24 @@ php artisan vendor:publish --tag="gowa-filament-config"
 
 ---
 
+## ⚙️ Environment Configuration (`.env`)
+
+Add the GOWA server connection credentials to your `.env` file:
+
+```env
+# GOWA WhatsApp Server Connection
+GOWA_BASE_URL=https://gowa.yourcompany.com
+GOWA_USERNAME=admin
+GOWA_PASSWORD=secret
+GOWA_TIMEOUT=15
+
+# Webhook Configuration (Optional)
+GOWA_WEBHOOK_SECRET=your_hmac_secret
+GOWA_WEBHOOK_PATH=webhooks/gowa
+```
+
+---
+
 ## ⚡ Quick Start
 
 Add `GowaPlugin` to your Filament Panel Provider (e.g., `AdminPanelProvider.php`):
