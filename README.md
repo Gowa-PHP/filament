@@ -31,8 +31,9 @@ This package is Phase 3 of the GOWA PHP ecosystem and interacts with the open-so
 
 ---
 
-## 📦 Requirements
+## 📦 Prerequisites & Requirements
 
+* **Running GOWA Server**: An active instance of [go-whatsapp-web-multidevice (GOWA)](https://github.com/aldinokemal/go-whatsapp-web-multidevice). `GOWA_BASE_URL` is **required** in your `.env`.
 * **PHP**: `>= 8.2`
 * **Laravel**: `^10.0 | ^11.0 | ^12.0`
 * **Filament**: `^5.0` (Tested & Verified) | `^3.0 | ^4.0` (Architectural Compatibility)
