@@ -27,6 +27,7 @@ use Gowa\Sdk\Dto\MediaUpload;
 use Gowa\Sdk\Dto\Presence;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\MessageBag;
 
@@ -181,6 +182,7 @@ class GowaMessagingPage extends Page implements HasForms
                             ->label(__('gowa-filament::gowa-filament.fields.media_file'))
                             ->directory('gowa-media')
                             ->visibility('public')
+                            ->preserveFilenames()
                             ->image(fn ($get) => in_array($get('message_type'), ['image', 'sticker'], true))
                             ->imageEditor(fn ($get) => $get('message_type') === 'image')
                             ->acceptedFileTypes(fn ($get) => match ($get('message_type')) {
@@ -318,32 +320,42 @@ class GowaMessagingPage extends Page implements HasForms
 
         if (! empty($data['media_file'])) {
             $file = $data['media_file'];
+
             if (is_array($file)) {
-                $key = key($file);
-                $val = reset($file);
-                $filePath = is_string($val) && str_contains($val, '/') ? $val : (is_string($key) && str_contains($key, '/') ? $key : (string) $val);
-            } else {
-                $filePath = (string) $file;
+                foreach ($file as $k => $v) {
+                    if ($v instanceof \Illuminate\Http\UploadedFile) {
+                        $file = $v;
+                        break;
+                    }
+                    if (is_string($v) && ! empty($v)) {
+                        $file = $v;
+                        break;
+                    }
+                    if (is_string($k) && ! empty($k) && str_contains($k, '.')) {
+                        $file = $k;
+                        break;
+                    }
+                }
             }
 
-            if ($filePath instanceof \Illuminate\Http\UploadedFile) {
-                $mediaPath = $filePath->getRealPath();
-                $originalName ??= $filePath->getClientOriginalName();
-            } else {
-                $originalName ??= basename($filePath);
+            if ($file instanceof \Illuminate\Http\UploadedFile) {
+                $mediaPath = $file->getRealPath();
+                $originalName ??= $file->getClientOriginalName();
+            } elseif (is_string($file)) {
+                $originalName ??= basename($file);
 
                 $candidates = [
-                    Storage::disk('public')->path($filePath),
-                    Storage::disk('local')->path($filePath),
-                    storage_path('app/public/' . $filePath),
-                    storage_path('app/' . $filePath),
-                    storage_path('app/livewire-tmp/' . $filePath),
-                    public_path('storage/' . $filePath),
-                    $filePath,
+                    $file,
+                    Storage::disk('public')->path($file),
+                    Storage::disk('local')->path($file),
+                    storage_path('app/public/' . $file),
+                    storage_path('app/' . $file),
+                    storage_path('app/livewire-tmp/' . $file),
+                    public_path('storage/' . $file),
                 ];
 
                 foreach ($candidates as $candidate) {
-                    if (! empty($candidate) && file_exists($candidate)) {
+                    if (! empty($candidate) && file_exists($candidate) && ! is_dir($candidate)) {
                         $mediaPath = $candidate;
                         break;
                     }
@@ -498,6 +510,10 @@ class GowaMessagingPage extends Page implements HasForms
                 ->success()
                 ->send();
         } catch (Exception $e) {
+            Log::error('GOWA Messaging Page Error: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
+
             Notification::make()
                 ->title(__('gowa-filament::gowa-filament.notifications.error_occurred'))
                 ->body($e->getMessage())
