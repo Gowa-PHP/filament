@@ -310,20 +310,47 @@ class GowaMessagingPage extends Page implements HasForms
     protected function resolveMediaUpload(array $data): MediaUpload
     {
         $mediaPath = null;
+        $originalName = null;
+
+        if (! empty($data['filename'])) {
+            $originalName = trim((string) $data['filename']);
+        }
 
         if (! empty($data['media_file'])) {
-            $filePath = is_array($data['media_file']) ? reset($data['media_file']) : $data['media_file'];
+            $file = $data['media_file'];
+            if (is_array($file)) {
+                $key = key($file);
+                $val = reset($file);
+                $filePath = is_string($val) && str_contains($val, '/') ? $val : (is_string($key) && str_contains($key, '/') ? $key : (string) $val);
+            } else {
+                $filePath = (string) $file;
+            }
+
             if ($filePath instanceof \Illuminate\Http\UploadedFile) {
                 $mediaPath = $filePath->getRealPath();
+                $originalName ??= $filePath->getClientOriginalName();
             } else {
-                $disk = config('filament.default_filesystem_disk', 'public');
-                $mediaPath = Storage::disk($disk)->path($filePath);
-                if (! file_exists($mediaPath) && file_exists(storage_path('app/' . $filePath))) {
-                    $mediaPath = storage_path('app/' . $filePath);
+                $originalName ??= basename($filePath);
+
+                $candidates = [
+                    Storage::disk('public')->path($filePath),
+                    Storage::disk('local')->path($filePath),
+                    storage_path('app/public/' . $filePath),
+                    storage_path('app/' . $filePath),
+                    storage_path('app/livewire-tmp/' . $filePath),
+                    public_path('storage/' . $filePath),
+                    $filePath,
+                ];
+
+                foreach ($candidates as $candidate) {
+                    if (! empty($candidate) && file_exists($candidate)) {
+                        $mediaPath = $candidate;
+                        break;
+                    }
                 }
             }
         } elseif (! empty($data['media_url'])) {
-            $mediaPath = $data['media_url'];
+            $mediaPath = trim((string) $data['media_url']);
         }
 
         if (empty($mediaPath)) {
@@ -331,8 +358,8 @@ class GowaMessagingPage extends Page implements HasForms
         }
 
         return filter_var($mediaPath, FILTER_VALIDATE_URL)
-            ? MediaUpload::fromUrl($mediaPath, filename: $data['filename'] ?? null)
-            : MediaUpload::fromPath($mediaPath, filename: $data['filename'] ?? null);
+            ? MediaUpload::fromUrl($mediaPath, filename: $originalName)
+            : MediaUpload::fromPath($mediaPath, filename: $originalName);
     }
 
     public function send(): void
