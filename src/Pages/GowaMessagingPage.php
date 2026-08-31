@@ -177,7 +177,7 @@ class GowaMessagingPage extends Page implements HasForms
                             ->placeholder('Ex: 3EB0C1234567890')
                             ->visible(fn ($get) => $get('message_type') === 'text'),
 
-                        // Filament Native FileUpload Component with Image Editor and Dynamic Mimes
+                        // Filament Native FileUpload Component with Image Editor and Explicit Document Mimes
                         FileUpload::make('media_file')
                             ->label(__('gowa-filament::gowa-filament.fields.media_file'))
                             ->directory('gowa-media')
@@ -189,6 +189,20 @@ class GowaMessagingPage extends Page implements HasForms
                                 'image', 'sticker' => ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
                                 'video' => ['video/mp4', 'video/3gpp', 'video/quicktime', 'video/avi', 'video/x-msvideo'],
                                 'audio' => ['audio/mp3', 'audio/ogg', 'audio/wav', 'audio/aac', 'audio/m4a', 'audio/mp4'],
+                                'document' => [
+                                    'application/pdf',
+                                    'text/csv',
+                                    'text/plain',
+                                    'application/msword',
+                                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                    'application/vnd.ms-excel',
+                                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                    'application/zip',
+                                    'application/x-zip-compressed',
+                                    'application/x-rar-compressed',
+                                    'application/json',
+                                    'text/xml',
+                                ],
                                 default => null,
                             })
                             ->visible(fn ($get) => in_array($get('message_type'), ['image', 'video', 'document', 'audio', 'sticker'], true)),
