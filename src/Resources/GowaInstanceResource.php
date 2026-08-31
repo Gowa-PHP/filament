@@ -118,7 +118,7 @@ class GowaInstanceResource extends Resource
                             ->revealable()
                             ->maxLength(255)
                             ->suffixAction(
-                                \Filament\Forms\Components\Actions\Action::make('generateSecret')
+                                \Filament\Actions\Action::make('generateSecret')
                                     ->icon('heroicon-o-sparkles')
                                     ->tooltip(__('gowa-filament::gowa-filament.fields.generate_secret_tooltip'))
                                     ->action(function (\Filament\Forms\Set $set): void {
