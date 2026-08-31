@@ -430,6 +430,36 @@ class GowaMessagingPage extends Page implements HasForms
                 default => throw new Exception("Tipo de mensagem '{$type}' não suportado."),
             };
 
+            // Reset media and message fields after successful dispatch
+            $this->form->fill([
+                'device_id' => $deviceId,
+                'recipient_type' => $data['recipient_type'] ?? 'private',
+                'to' => $to,
+                'message_type' => $type,
+                'message' => '',
+                'reply_to' => '',
+                'media_file' => null,
+                'media_url' => '',
+                'caption' => '',
+                'filename' => '',
+                'is_voice' => true,
+                'contact_name' => '',
+                'contact_phone' => '',
+                'latitude' => '',
+                'longitude' => '',
+                'location_name' => '',
+                'address' => '',
+                'url' => '',
+                'link_text' => '',
+                'question' => '',
+                'poll_options' => [
+                    ['option_name' => 'Manhã (08h - 12h)'],
+                    ['option_name' => 'Tarde (13h - 18h)'],
+                ],
+                'selectable_count' => 1,
+                'presence_type' => 'composing',
+            ]);
+
             Notification::make()
                 ->title($type === 'presence' ? __('gowa-filament::gowa-filament.notifications.presence_updated') : __('gowa-filament::gowa-filament.notifications.message_sent'))
                 ->success()
