@@ -9,6 +9,8 @@
             "email": "aguinaldo.tupy@gmail.com"
         }
     ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": "^8.2",
         "gowa-php/sdk": "^1.0",
@@ -39,6 +41,9 @@
         "sort-packages": true
     },
     "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
+        },
         "laravel": {
             "providers": [
                 "Gowa\\Filament\\GowaFilamentServiceProvider"
