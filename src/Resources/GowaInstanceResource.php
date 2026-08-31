@@ -109,6 +109,7 @@ class GowaInstanceResource extends Resource
         return $schema
             ->components([
                 Section::make(__('gowa-filament::gowa-filament.actions.view_heading'))
+                    ->columnSpanFull()
                     ->schema([
                         Grid::make(3)
                             ->schema([
@@ -164,6 +165,7 @@ class GowaInstanceResource extends Resource
                     ]),
 
                 Section::make('Informações de Conexão')
+                    ->columnSpanFull()
                     ->schema([
                         TextEntry::make('status')
                             ->label('Status da Conexão')
@@ -317,12 +319,12 @@ class GowaInstanceResource extends Resource
                         ->slideOver()
                         ->modalHeading(__('gowa-filament::gowa-filament.actions.view_heading'))
                         ->modalDescription(__('gowa-filament::gowa-filament.actions.view_desc'))
-                        ->modalWidth(Width::Medium),
+                        ->modalWidth(Width::Large),
                     EditAction::make()
                         ->slideOver()
                         ->modalHeading(__('gowa-filament::gowa-filament.actions.edit_heading'))
                         ->modalDescription(__('gowa-filament::gowa-filament.actions.edit_desc'))
-                        ->modalWidth(Width::Medium),
+                        ->modalWidth(Width::Large),
                     DeleteAction::make(),
                 ]),
             ])
