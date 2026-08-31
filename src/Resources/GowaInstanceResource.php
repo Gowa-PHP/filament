@@ -86,6 +86,16 @@ class GowaInstanceResource extends Resource
                     ->hiddenOn(Operation::Create)
                     ->maxLength(255)
                     ->columnSpanFull(),
+
+                TextInput::make('webhook_url')
+                    ->label(__('gowa-filament::gowa-filament.fields.webhook_url'))
+                    ->helperText(__('gowa-filament::gowa-filament.fields.webhook_url_helper'))
+                    ->prefixIcon('heroicon-o-link')
+                    ->formatStateUsing(fn ($record): ?string => $record ? url(config('gowa.webhook.path', 'webhooks/gowa') . '/' . $record->device_id) : null)
+                    ->readOnly()
+                    ->hiddenOn(Operation::Create)
+                    ->maxLength(255)
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -104,6 +114,13 @@ class GowaInstanceResource extends Resource
                     ->searchable()
                     ->copyable()
                     ->fontFamily('mono'),
+
+                TextColumn::make('webhook_url')
+                    ->label(__('gowa-filament::gowa-filament.fields.webhook_url'))
+                    ->getStateUsing(fn ($record): string => url(config('gowa.webhook.path', 'webhooks/gowa') . '/' . $record->device_id))
+                    ->copyable()
+                    ->fontFamily('mono')
+                    ->toggleable(isToggledHiddenByDefault: false),
 
                 TextColumn::make('phone_number')
                     ->label(__('gowa-filament::gowa-filament.fields.phone'))

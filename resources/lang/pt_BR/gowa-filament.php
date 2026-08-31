@@ -41,6 +41,8 @@ return [
         'poll_option_name' => 'Opção',
         'selectable_count' => 'Máximo de Seleções Permitidas',
         'presence_type' => 'Status de Presença',
+        'webhook_url' => 'URL do Webhook',
+        'webhook_url_helper' => 'URL gerada automaticamente com o APP_URL do Laravel para escutar eventos.',
     ],
     'status' => [
         'connected' => 'Conectado',
@@ -61,6 +63,8 @@ return [
         'disconnect' => 'Desconectar',
         'refresh_status' => 'Atualizar Status',
         'send_message' => 'Enviar WhatsApp',
+        'send_document' => 'Enviar Documento WhatsApp',
+        'send_media' => 'Enviar Mídia WhatsApp',
         'send_test_message' => 'Testar Envio',
         'disconnect_confirm' => 'Tem certeza de que deseja desconectar este aparelho?',
         'view_curl' => 'Ver cURL',
