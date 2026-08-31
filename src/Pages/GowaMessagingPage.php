@@ -124,11 +124,13 @@ class GowaMessagingPage extends Page implements HasForms
                         Grid::make(3)->schema([
                             Select::make('device_id')
                                 ->label(__('gowa-filament::gowa-filament.fields.instance'))
+                                ->native(false)
                                 ->options($instances)
                                 ->required(),
 
                             Select::make('recipient_type')
                                 ->label(__('gowa-filament::gowa-filament.fields.recipient_type'))
+                                ->native(false)
                                 ->options([
                                     'private' => 'Mensagem Privada (Número)',
                                     'group' => 'Grupo (Group JID)',
@@ -148,6 +150,7 @@ class GowaMessagingPage extends Page implements HasForms
                     ->schema([
                         Select::make('message_type')
                             ->label(__('gowa-filament::gowa-filament.fields.message_type'))
+                            ->native(false)
                             ->options([
                                 'text' => '💬 Texto (Text)',
                                 'image' => '🖼️ Imagem (Image)',
@@ -300,6 +303,7 @@ class GowaMessagingPage extends Page implements HasForms
 
                             Select::make('selectable_count')
                                 ->label(__('gowa-filament::gowa-filament.fields.selectable_count'))
+                                ->native(false)
                                 ->options([
                                     1 => '1 opção',
                                     2 => '2 opções',
@@ -311,6 +315,7 @@ class GowaMessagingPage extends Page implements HasForms
                         // Presence Fields
                         Select::make('presence_type')
                             ->label(__('gowa-filament::gowa-filament.fields.presence_type'))
+                            ->native(false)
                             ->options([
                                 'composing' => '⌨️ Digitando... (Composing)',
                                 'recording' => '🎙️ Gravando áudio... (Recording)',

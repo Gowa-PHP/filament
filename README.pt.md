@@ -124,6 +124,28 @@ public function panel(Panel $panel): Panel
 
 ---
 
+## 📸 Capturas de Tela
+
+### Instâncias do WhatsApp
+
+<p align="center">
+  <img src="art/instances-list.png" alt="Lista de instâncias do WhatsApp no Filament" width="100%">
+</p>
+
+### Detalhes da instância
+
+<p align="center">
+  <img src="art/instance-details.png" alt="Slide-over de detalhes da instância do WhatsApp no Filament" width="100%">
+</p>
+
+### Central de mensagens
+
+<p align="center">
+  <img src="art/messaging-center.png" alt="Central de mensagens do WhatsApp no Filament" width="100%">
+</p>
+
+---
+
 ## 💡 Exemplos de Uso das Ações Especializadas
 
 ### 1. Enviar Mensagem de Texto Rápida (`SendGowaMessageAction`)
