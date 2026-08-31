@@ -14,7 +14,7 @@ Conecte instâncias via QR Code ou Código de Pareamento de 8 dígitos, envie me
 * **PHP**: `>= 8.2`
 * **Laravel**: `^10.0 | ^11.0 | ^12.0`
 * **Filament**: `^5.0` (Testado e Validado) | `^3.0 | ^4.0` (Compatibilidade Arquitetural)
-* **Pacotes GOWA**: `gowa-php/sdk ^1.0`, `gowa-php/laravel ^1.0`
+* **Pacotes GOWA**: `gowa-php/sdk ^1.1`, `gowa-php/laravel ^1.1`
 
 > [!NOTE]
 > Este pacote está **testado e validado no Filament v5**. A compatibilidade com Filament v3 e v4 é mantida em nível arquitetural.
@@ -75,15 +75,20 @@ public function panel(Panel $panel): Panel
   - 🔗 **Link com Preview**: Envio de links com pré-visualização open-graph.
   - 📊 **Enquete**: Criação de enquetes interativas com múltiplas opções.
   - 📡 **Status de Presença**: Atualização de status digitando (`composing`) ou gravando (`recording`).
-- **✉️ Ação Personalizada (`SendGowaMessageAction`)**: Botão de ação para tabelas e formulários que abre modal para envio direto de mensagens via WhatsApp.
+- **✉️ Actions Especializadas para Resources**:
+  - `SendGowaMessageAction`: Envio rápido de mensagens de texto com templates dinâmicos.
+  - `SendGowaDocumentAction`: Envio de PDFs, faturas, contratos ou relatórios via arquivo ou URL.
+  - `SendGowaMediaAction`: Envio de imagens, vídeos ou áudios com legendas personalizadas.
 - **📊 Widget de Status (`GowaDeviceStatusWidget`)**: Dashboard card exibindo instâncias Conectadas, Conectando e Desconectadas em tempo real.
 - **🌐 Suporte Multilíngue**: Tradução nativa em Inglês (`en`) e Português (`pt_BR`).
 
 ---
 
-## 💡 Exemplos de Uso
+## 💡 Exemplos de Uso das Actions
 
-### 1. Adicionando `SendGowaMessageAction` a uma Tabela de Resource
+### 1. Enviar Mensagem Rápida de Texto (`SendGowaMessageAction`)
+
+Adicione uma ação de texto do WhatsApp a qualquer tabela de Resource do Filament:
 
 ```php
 use Gowa\Filament\Actions\SendGowaMessageAction;
@@ -94,9 +99,40 @@ public static function table(Table $table): Table
         ->columns([ ... ])
         ->actions([
             SendGowaMessageAction::make()
-                ->numberFrom('telefone'), // Resolve o telefone do registro
+                ->numberFrom('telefone') // Resolve o telefone do registro
+                ->message(fn ($record) => "Olá {$record->nome}, seu pedido #{$record->id} foi despachado!"),
         ]);
 }
+```
+
+### 2. Enviar Documento PDF ou Fatura (`SendGowaDocumentAction`)
+
+Dispare faturas, contratos ou relatórios em PDF para clientes:
+
+```php
+use Gowa\Filament\Actions\SendGowaDocumentAction;
+
+SendGowaDocumentAction::make('sendInvoice')
+    ->label('Enviar Fatura em PDF')
+    ->numberFrom('cliente.telefone')
+    ->documentUrl(fn ($record) => $record->pdf_download_url)
+    ->filename(fn ($record) => "fatura-{$record->codigo}.pdf");
+```
+
+### 3. Enviar Mídia / Fotos / Vídeos (`SendGowaMediaAction`)
+
+Envie comprovantes de pagamento, fotos de produtos ou anexos em vídeo com legenda:
+
+```php
+use Gowa\Filament\Actions\SendGowaMediaAction;
+use Gowa\Sdk\Dto\MediaType;
+
+SendGowaMediaAction::make('sendReceipt')
+    ->label('Enviar Comprovante')
+    ->type(MediaType::Image)
+    ->numberFrom('cliente_telefone')
+    ->mediaFrom('caminho_comprovante')
+    ->caption('Segue o seu comprovante de pagamento.');
 ```
 
 ---

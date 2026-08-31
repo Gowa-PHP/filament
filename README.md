@@ -15,7 +15,7 @@ Connect instances via QR Code or 8-digit Pairing Code, send messages across 11 s
 * **PHP**: `>= 8.2`
 * **Laravel**: `^10.0 | ^11.0 | ^12.0`
 * **Filament**: `^5.0` (Tested & Verified) | `^3.0 | ^4.0` (Architectural Compatibility)
-* **GOWA Packages**: `gowa-php/sdk ^1.0`, `gowa-php/laravel ^1.0`
+* **GOWA Packages**: `gowa-php/sdk ^1.1`, `gowa-php/laravel ^1.1`
 
 > [!NOTE]
 > This package is currently **tested and verified on Filament v5**. Support for Filament v3 and v4 is maintained at the architecture level.
@@ -76,15 +76,20 @@ public function panel(Panel $panel): Panel
   - 🔗 **Link Preview**: Send links with automated open-graph previews.
   - 📊 **Poll**: Interactive multi-option voting polls.
   - 📡 **Presence Status**: Update typing (`composing`) or recording (`recording`) status.
-- **✉️ Custom Table & Form Action (`SendGowaMessageAction`)**: Trigger WhatsApp modal actions directly from any Filament Resource.
+- **✉️ Specialized Resource Actions**:
+  - `SendGowaMessageAction`: Quick text messages with dynamic templates.
+  - `SendGowaDocumentAction`: Send PDFs, invoices, contracts, or spreadsheets via file path or URL.
+  - `SendGowaMediaAction`: Send images, videos, or audio with custom captions.
 - **📊 Real-time Status Widget (`GowaDeviceStatusWidget`)**: Dashboard card displaying Connected, Connecting, and Offline instances.
 - **🌐 Multilingual Support**: Built-in English (`en`) and Portuguese (`pt_BR`) translations.
 
 ---
 
-## 💡 Usage Examples
+## 💡 Specialized Actions Usage Examples
 
-### 1. Adding `SendGowaMessageAction` to a Resource Table
+### 1. Send Quick Text Message (`SendGowaMessageAction`)
+
+Add a WhatsApp text action to any Filament Resource table:
 
 ```php
 use Gowa\Filament\Actions\SendGowaMessageAction;
@@ -95,9 +100,40 @@ public static function table(Table $table): Table
         ->columns([ ... ])
         ->actions([
             SendGowaMessageAction::make()
-                ->numberFrom('phone_number'), // Resolves phone from record
+                ->numberFrom('phone_number') // Resolves recipient phone from record
+                ->message(fn ($record) => "Hello {$record->name}, your order #{$record->id} has been shipped!"),
         ]);
 }
+```
+
+### 2. Send PDF Document or Invoice (`SendGowaDocumentAction`)
+
+Easily dispatch invoices, contracts, or report PDFs to customers:
+
+```php
+use Gowa\Filament\Actions\SendGowaDocumentAction;
+
+SendGowaDocumentAction::make('sendInvoice')
+    ->label('Send Invoice PDF')
+    ->numberFrom('customer.phone')
+    ->documentUrl(fn ($record) => $record->pdf_download_url)
+    ->filename(fn ($record) => "invoice-{$record->code}.pdf");
+```
+
+### 3. Send Media / Photos / Videos (`SendGowaMediaAction`)
+
+Send image receipts, product photos, or video attachments with custom captions:
+
+```php
+use Gowa\Filament\Actions\SendGowaMediaAction;
+use Gowa\Sdk\Dto\MediaType;
+
+SendGowaMediaAction::make('sendReceipt')
+    ->label('Send Payment Receipt')
+    ->type(MediaType::Image)
+    ->numberFrom('client_phone')
+    ->mediaFrom('receipt_path')
+    ->caption('Here is your payment confirmation receipt.');
 ```
 
 ---
