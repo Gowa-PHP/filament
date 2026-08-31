@@ -4,6 +4,7 @@ namespace Gowa\Filament\Pages;
 
 use Exception;
 use Filament\Actions\Action;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -26,6 +27,7 @@ use Gowa\Sdk\Dto\MediaUpload;
 use Gowa\Sdk\Dto\Presence;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\MessageBag;
 
 class GowaMessagingPage extends Page implements HasForms
@@ -174,13 +176,21 @@ class GowaMessagingPage extends Page implements HasForms
                             ->placeholder('Ex: 3EB0C1234567890')
                             ->visible(fn ($get) => $get('message_type') === 'text'),
 
-                        // Media URL / File Upload for Image, Video, Document, Audio, Sticker
+                        // Filament Native FileUpload Component with Image Editor
+                        FileUpload::make('media_file')
+                            ->label(__('gowa-filament::gowa-filament.fields.media_file'))
+                            ->directory('gowa-media')
+                            ->visibility('public')
+                            ->image(fn ($get) => in_array($get('message_type'), ['image', 'sticker'], true))
+                            ->imageEditor(fn ($get) => $get('message_type') === 'image')
+                            ->visible(fn ($get) => in_array($get('message_type'), ['image', 'video', 'document', 'audio', 'sticker'], true)),
+
+                        // External URL fallback
                         TextInput::make('media_url')
                             ->label(__('gowa-filament::gowa-filament.fields.media_url'))
                             ->placeholder('https://exemplo.com/midia.jpg ou /caminho/local/midia.jpg')
                             ->prefixIcon('heroicon-o-link')
-                            ->visible(fn ($get) => in_array($get('message_type'), ['image', 'video', 'document', 'audio', 'sticker'], true))
-                            ->required(fn ($get) => in_array($get('message_type'), ['image', 'video', 'document', 'audio', 'sticker'], true)),
+                            ->visible(fn ($get) => in_array($get('message_type'), ['image', 'video', 'document', 'audio', 'sticker'], true)),
 
                         TextInput::make('caption')
                             ->label(__('gowa-filament::gowa-filament.fields.caption'))
@@ -291,6 +301,34 @@ class GowaMessagingPage extends Page implements HasForms
             ->statePath('data');
     }
 
+    protected function resolveMediaUpload(array $data): MediaUpload
+    {
+        $mediaPath = null;
+
+        if (! empty($data['media_file'])) {
+            $filePath = is_array($data['media_file']) ? reset($data['media_file']) : $data['media_file'];
+            if ($filePath instanceof \Illuminate\Http\UploadedFile) {
+                $mediaPath = $filePath->getRealPath();
+            } else {
+                $disk = config('filament.default_filesystem_disk', 'public');
+                $mediaPath = Storage::disk($disk)->path($filePath);
+                if (! file_exists($mediaPath) && file_exists(storage_path('app/' . $filePath))) {
+                    $mediaPath = storage_path('app/' . $filePath);
+                }
+            }
+        } elseif (! empty($data['media_url'])) {
+            $mediaPath = $data['media_url'];
+        }
+
+        if (empty($mediaPath)) {
+            throw new Exception('Faça o upload de um arquivo ou informe a URL da mídia.');
+        }
+
+        return filter_var($mediaPath, FILTER_VALIDATE_URL)
+            ? MediaUpload::fromUrl($mediaPath, filename: $data['filename'] ?? null)
+            : MediaUpload::fromPath($mediaPath, filename: $data['filename'] ?? null);
+    }
+
     public function send(): void
     {
         $data = $this->form->getState();
@@ -312,7 +350,7 @@ class GowaMessagingPage extends Page implements HasForms
                     $to,
                     new MediaPayload(
                         type: MediaType::Image,
-                        upload: filter_var($data['media_url'], FILTER_VALIDATE_URL) ? MediaUpload::fromUrl($data['media_url']) : MediaUpload::fromPath($data['media_url']),
+                        upload: $this->resolveMediaUpload($data),
                         caption: $data['caption'] ?? null,
                     )
                 ),
@@ -322,7 +360,7 @@ class GowaMessagingPage extends Page implements HasForms
                     $to,
                     new MediaPayload(
                         type: MediaType::Video,
-                        upload: filter_var($data['media_url'], FILTER_VALIDATE_URL) ? MediaUpload::fromUrl($data['media_url']) : MediaUpload::fromPath($data['media_url']),
+                        upload: $this->resolveMediaUpload($data),
                         caption: $data['caption'] ?? null,
                     )
                 ),
@@ -332,9 +370,7 @@ class GowaMessagingPage extends Page implements HasForms
                     $to,
                     new MediaPayload(
                         type: MediaType::Document,
-                        upload: filter_var($data['media_url'], FILTER_VALIDATE_URL)
-                            ? MediaUpload::fromUrl($data['media_url'], filename: $data['filename'] ?? null)
-                            : MediaUpload::fromPath($data['media_url'], filename: $data['filename'] ?? null),
+                        upload: $this->resolveMediaUpload($data),
                     )
                 ),
 
@@ -343,7 +379,7 @@ class GowaMessagingPage extends Page implements HasForms
                     $to,
                     new MediaPayload(
                         type: MediaType::Audio,
-                        upload: filter_var($data['media_url'], FILTER_VALIDATE_URL) ? MediaUpload::fromUrl($data['media_url']) : MediaUpload::fromPath($data['media_url']),
+                        upload: $this->resolveMediaUpload($data),
                         voice: (bool) ($data['is_voice'] ?? true),
                     )
                 ),
@@ -353,7 +389,7 @@ class GowaMessagingPage extends Page implements HasForms
                     $to,
                     new MediaPayload(
                         type: MediaType::Sticker,
-                        upload: filter_var($data['media_url'], FILTER_VALIDATE_URL) ? MediaUpload::fromUrl($data['media_url']) : MediaUpload::fromPath($data['media_url']),
+                        upload: $this->resolveMediaUpload($data),
                     )
                 ),
 
