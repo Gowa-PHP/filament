@@ -121,7 +121,7 @@ class GowaInstanceResource extends Resource
                                 \Filament\Actions\Action::make('generateSecret')
                                     ->icon('heroicon-o-sparkles')
                                     ->tooltip(__('gowa-filament::gowa-filament.fields.generate_secret_tooltip'))
-                                    ->action(function (\Filament\Forms\Set $set): void {
+                                    ->action(function ($set): void {
                                         $set('webhook_secret', \Illuminate\Support\Str::random(32));
                                     })
                             ),
