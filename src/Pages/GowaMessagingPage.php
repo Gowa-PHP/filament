@@ -183,7 +183,6 @@ class GowaMessagingPage extends Page implements HasForms
                             ->directory('gowa-media')
                             ->visibility('public')
                             ->preserveFilenames()
-                            ->image(fn ($get) => in_array($get('message_type'), ['image', 'sticker'], true))
                             ->imageEditor(fn ($get) => $get('message_type') === 'image')
                             ->acceptedFileTypes(fn ($get) => match ($get('message_type')) {
                                 'image', 'sticker' => ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
