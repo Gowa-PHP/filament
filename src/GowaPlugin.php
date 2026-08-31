@@ -27,7 +27,7 @@ class GowaPlugin implements Plugin
     public static function get(): static
     {
         /** @var static $plugin */
-        $plugin = filament()->getPlugin('gowa-filament');
+        $plugin = filament()->getPlugin(app(static::class)->getId());
 
         return $plugin;
     }
@@ -39,6 +39,11 @@ class GowaPlugin implements Plugin
         return $this;
     }
 
+    public function hasInstanceResource(): bool
+    {
+        return $this->hasInstanceResource;
+    }
+
     public function deviceStatusWidget(bool $condition = true): static
     {
         $this->hasDeviceStatusWidget = $condition;
@@ -46,11 +51,21 @@ class GowaPlugin implements Plugin
         return $this;
     }
 
+    public function hasDeviceStatusWidget(): bool
+    {
+        return $this->hasDeviceStatusWidget;
+    }
+
     public function messagingPage(bool $condition = true): static
     {
         $this->hasMessagingPage = $condition;
 
         return $this;
+    }
+
+    public function hasMessagingPage(): bool
+    {
+        return $this->hasMessagingPage;
     }
 
     public function register(Panel $panel): void
