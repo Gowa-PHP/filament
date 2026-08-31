@@ -46,6 +46,7 @@ return [
         'webhook_secret' => 'Webhook Secret (HMAC Secret)',
         'webhook_secret_placeholder' => 'Leave empty to disable HMAC signature',
         'webhook_secret_helper' => 'HMAC SHA-256 key sent in the X-Gowa-Signature header.',
+        'generate_secret_tooltip' => 'Generate Random Secret (32 chars)',
         'webhook_insecure_skip_verify' => 'Ignore SSL/TLS Verification (Insecure Skip Verify)',
         'webhook_insecure_skip_verify_helper' => 'Enable to accept self-signed or untrusted SSL certificates on the webhook server.',
         'official_name' => 'WhatsApp Profile Name',

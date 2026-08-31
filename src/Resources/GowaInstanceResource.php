@@ -116,7 +116,15 @@ class GowaInstanceResource extends Resource
                             ->prefixIcon('heroicon-o-key')
                             ->password()
                             ->revealable()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->suffixAction(
+                                \Filament\Forms\Components\Actions\Action::make('generateSecret')
+                                    ->icon('heroicon-o-sparkles')
+                                    ->tooltip(__('gowa-filament::gowa-filament.fields.generate_secret_tooltip'))
+                                    ->action(function (\Filament\Forms\Set $set): void {
+                                        $set('webhook_secret', \Illuminate\Support\Str::random(32));
+                                    })
+                            ),
 
                         Toggle::make('meta.webhook_insecure_skip_verify')
                             ->label(__('gowa-filament::gowa-filament.fields.webhook_insecure_skip_verify'))
