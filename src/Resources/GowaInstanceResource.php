@@ -13,6 +13,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Enums\Operation;
 use Filament\Support\Enums\Width;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Gowa\Filament\Actions\SendGowaMessageAction;
@@ -103,6 +104,25 @@ class GowaInstanceResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('avatar_url')
+                    ->label('')
+                    ->circular()
+                    ->defaultImageUrl(fn ($record): string => 'https://ui-avatars.com/api/?name=' . urlencode($record->name ?? 'WA') . '&color=128C7E&background=DCF8C6')
+                    ->getStateUsing(function ($record): ?string {
+                        if (empty($record->phone_number) || empty($record->device_id)) {
+                            return null;
+                        }
+
+                        return cache()->remember('gowa_avatar_' . $record->device_id, 86400, function () use ($record) {
+                            try {
+                                $avatar = \Gowa\Laravel\Facades\Gowa::avatar($record->device_id, $record->phone_number);
+                                return $avatar?->url;
+                            } catch (\Throwable $e) {
+                                return null;
+                            }
+                        });
+                    }),
+
                 TextColumn::make('name')
                     ->label(__('gowa-filament::gowa-filament.fields.name'))
                     ->searchable()
