@@ -127,13 +127,21 @@ class GowaInstanceResource extends Resource
                     ->label(__('gowa-filament::gowa-filament.fields.name'))
                     ->searchable()
                     ->sortable()
-                    ->weight('bold'),
+                    ->weight('bold')
+                    ->description(function ($record): ?string {
+                        if (empty($record->device_id)) {
+                            return null;
+                        }
 
-                TextColumn::make('device_id')
-                    ->label(__('gowa-filament::gowa-filament.fields.device_id'))
-                    ->searchable()
-                    ->copyable()
-                    ->fontFamily('mono'),
+                        return cache()->remember('gowa_device_name_' . $record->device_id, 3600, function () use ($record) {
+                            try {
+                                $device = \Gowa\Laravel\Facades\Gowa::device($record->device_id);
+                                return $device?->name ? ('Perfil: ' . $device->name) : null;
+                            } catch (\Throwable $e) {
+                                return null;
+                            }
+                        });
+                    }),
 
                 TextColumn::make('phone_number')
                     ->label(__('gowa-filament::gowa-filament.fields.phone'))
