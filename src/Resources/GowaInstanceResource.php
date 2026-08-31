@@ -210,7 +210,19 @@ class GowaInstanceResource extends Resource
                                 TextEntry::make('connected_at')
                                     ->label('Conectado em')
                                     ->dateTime()
-                                    ->placeholder('Nunca'),
+                                    ->placeholder('Nunca')
+                                    ->getStateUsing(function ($record) {
+                                        if ($record->connected_at) {
+                                            return $record->connected_at;
+                                        }
+
+                                        $statusStr = $record->status instanceof GowaInstanceStatus ? $record->status->value : (string) $record->status;
+                                        if (in_array($statusStr, ['open', 'connected'], true)) {
+                                            return $record->created_at;
+                                        }
+
+                                        return null;
+                                    }),
 
                                 TextEntry::make('updated_at')
                                     ->label('Última Atividade')
