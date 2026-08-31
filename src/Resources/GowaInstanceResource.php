@@ -67,7 +67,7 @@ class GowaInstanceResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Informações Principais')
+                Section::make(__('gowa-filament::gowa-filament.fields.main_info'))
                     ->columnSpanFull()
                     ->schema([
                         TextInput::make('name')
@@ -96,7 +96,7 @@ class GowaInstanceResource extends Resource
                             ->maxLength(255),
                     ]),
 
-                Section::make('Configurações do Webhook')
+                Section::make(__('gowa-filament::gowa-filament.fields.webhook_settings'))
                     ->columnSpanFull()
                     ->schema([
                         TextInput::make('webhook_url')
@@ -110,17 +110,17 @@ class GowaInstanceResource extends Resource
                             ->maxLength(255),
 
                         TextInput::make('webhook_secret')
-                            ->label('Segredo do Webhook (HMAC Secret)')
-                            ->placeholder('Deixe em branco para desativar assinatura HMAC')
-                            ->helperText('Chave HMAC SHA-256 enviada no cabeçalho X-Gowa-Signature')
+                            ->label(__('gowa-filament::gowa-filament.fields.webhook_secret'))
+                            ->placeholder(__('gowa-filament::gowa-filament.fields.webhook_secret_placeholder'))
+                            ->helperText(__('gowa-filament::gowa-filament.fields.webhook_secret_helper'))
                             ->prefixIcon('heroicon-o-key')
                             ->password()
                             ->revealable()
                             ->maxLength(255),
 
                         Toggle::make('meta.webhook_insecure_skip_verify')
-                            ->label('Ignorar validação SSL/TLS (Insecure Skip Verify)')
-                            ->helperText('Ative para aceitar certificados SSL autoassinados ou não confiáveis no servidor webhook.'),
+                            ->label(__('gowa-filament::gowa-filament.fields.webhook_insecure_skip_verify'))
+                            ->helperText(__('gowa-filament::gowa-filament.fields.webhook_insecure_skip_verify_helper')),
                     ]),
             ]);
     }
@@ -164,7 +164,7 @@ class GowaInstanceResource extends Resource
                                             ->size('lg'),
 
                                         TextEntry::make('official_name')
-                                            ->label('Perfil WhatsApp')
+                                            ->label(__('gowa-filament::gowa-filament.fields.official_name'))
                                             ->color('success')
                                             ->getStateUsing(function ($record): ?string {
                                                 if (empty($record->device_id)) {
@@ -185,11 +185,11 @@ class GowaInstanceResource extends Resource
                             ]),
                     ]),
 
-                Section::make('Informações de Conexão')
+                Section::make(__('gowa-filament::gowa-filament.fields.connection_info'))
                     ->columnSpanFull()
                     ->schema([
                         TextEntry::make('status')
-                            ->label('Status da Conexão')
+                            ->label(__('gowa-filament::gowa-filament.fields.connection_status'))
                             ->badge()
                             ->color(fn (mixed $state): string => match ($state instanceof GowaInstanceStatus ? $state->value : (string) $state) {
                                 'open', 'connected' => 'success',
@@ -229,9 +229,9 @@ class GowaInstanceResource extends Resource
                         Grid::make(2)
                             ->schema([
                                 TextEntry::make('connected_at')
-                                    ->label('Conectado em')
+                                    ->label(__('gowa-filament::gowa-filament.fields.connected_at'))
                                     ->dateTime()
-                                    ->placeholder('Nunca')
+                                    ->placeholder(__('gowa-filament::gowa-filament.fields.never'))
                                     ->getStateUsing(function ($record) {
                                         if ($record->connected_at) {
                                             return $record->connected_at;
@@ -246,7 +246,7 @@ class GowaInstanceResource extends Resource
                                     }),
 
                                 TextEntry::make('updated_at')
-                                    ->label('Última Atividade')
+                                    ->label(__('gowa-filament::gowa-filament.fields.last_activity'))
                                     ->dateTime(),
                             ]),
                     ]),
@@ -321,13 +321,13 @@ class GowaInstanceResource extends Resource
                     }),
 
                 TextColumn::make('connected_at')
-                    ->label('Connected At')
+                    ->label(__('gowa-filament::gowa-filament.fields.connected_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('updated_at')
-                    ->label('Last Activity')
+                    ->label(__('gowa-filament::gowa-filament.fields.last_activity'))
                     ->dateTime()
                     ->sortable(),
             ])

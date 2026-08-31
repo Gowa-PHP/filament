@@ -20,6 +20,6 @@ class ConnectPairingCodeAction
                 'deviceId' => $record->device_id ?? (string) $record->getKey(),
             ]))
             ->modalSubmitAction(false)
-            ->modalCancelActionLabel('Close');
+            ->modalCancelActionLabel(__('gowa-filament::gowa-filament.actions.close'));
     }
 }
