@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "pt-BR"
+early_access: false
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+  instructions: |
+    Siga estritamente as convenções de código definidas no projeto e validadas pelo PHP CS Fixer (.php-cs-fixer.dist.php):
+    - Todo arquivo PHP DEVE iniciar com `declare(strict_types=1);` logo após `<?php`.
+    - Padrão de formatação PER-CS 2.0 / PSR-12, com indentação estrita de 4 espaços.
+    - Imports (`use`) DEVEM ser ordenados alfabeticamente. Nenhum import não utilizado é permitido.
+    - Tipagem explícita e estrita para todos os parâmetros e retornos de métodos.
+    - Trailing commas obrigatórios em listas multilinhas (arrays, argumentos, parâmetros e match).
+    - Métodos e variáveis em camelCase; classes, interfaces e enums em PascalCase.
+    - Alinhamento de operadores `=>` em arrays associativos.
+path_filters:
+  - "!art/**"
+  - "!vendor/**"
+  - "!storage/**"
+  - "!node_modules/**"
+  - "!*.lock"
+  - "!*.cache"
