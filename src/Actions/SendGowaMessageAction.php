@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Actions;
 
 use Closure;
@@ -35,10 +37,25 @@ class SendGowaMessageAction extends Action
             ->color('success')
             ->modalHeading(__('gowa-filament::gowa-filament.actions.send_message'))
             ->modalWidth(Width::Medium)
-            ->form(fn (self $action, ?Model $record): array => $action->getFormSchema($record))
+            ->form(fn(self $action, ?Model $record): array => $action->getFormSchema($record))
             ->action(function (array $data, self $action, ?Model $record): void {
                 $action->executeSendMessage($data, $record);
             });
+    }
+
+    public function to(string|Closure $to): static
+    {
+        return $this->number($to);
+    }
+
+    public function from(string|int|Closure $from): static
+    {
+        return $this->instance($from);
+    }
+
+    public function text(string|Closure $text): static
+    {
+        return $this->message($text);
     }
 
     public function numberFrom(string|Closure $columnOrClosure): static
@@ -167,10 +184,13 @@ class SendGowaMessageAction extends Action
                 throw new Exception('Nenhuma instância do WhatsApp encontrada para realizar o envio.');
             }
 
-            $recipient = (string) ($data['to'] ?? '');
-            $text = (string) ($data['message'] ?? '');
+            $recipient = (string) ($data['to'] ?? $this->resolveNumber($record));
+            $text = (string) ($data['message'] ?? $this->resolveMessage($record));
 
-            Gowa::sendText($deviceId, $recipient, $text);
+            Gowa::to($recipient)
+                ->from($deviceId)
+                ->text($text)
+                ->send();
 
             Notification::make()
                 ->title(__('gowa-filament::gowa-filament.notifications.message_sent'))

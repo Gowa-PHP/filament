@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament;
 
 use Gowa\Filament\Livewire\GowaPairingCode;
@@ -13,7 +15,7 @@ class GowaFilamentServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(
             __DIR__ . '/../config/gowa-filament.php',
-            'gowa-filament'
+            'gowa-filament',
         );
     }
 

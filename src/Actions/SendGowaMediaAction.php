@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Actions;
 
 use Closure;
@@ -42,7 +44,7 @@ class SendGowaMediaAction extends Action
             ->color('success')
             ->modalHeading(__('gowa-filament::gowa-filament.actions.send_media'))
             ->modalWidth(Width::Medium)
-            ->form(fn (self $action, ?Model $record): array => $action->getFormSchema($record))
+            ->form(fn(self $action, ?Model $record): array => $action->getFormSchema($record))
             ->action(function (array $data, self $action, ?Model $record): void {
                 $action->executeSendMedia($data, $record);
             });
@@ -52,6 +54,16 @@ class SendGowaMediaAction extends Action
     {
         $this->mediaType = $type;
         return $this;
+    }
+
+    public function to(string|Closure $to): static
+    {
+        return $this->number($to);
+    }
+
+    public function from(string|int|Closure $from): static
+    {
+        return $this->instance($from);
     }
 
     public function numberFrom(string|Closure $columnOrClosure): static
@@ -130,12 +142,12 @@ class SendGowaMediaAction extends Action
                 ->visibility('public')
                 ->maxSize(51200)
                 ->preserveFilenames()
-                ->imageEditor(fn () => $this->mediaType === MediaType::Image)
+                ->imageEditor(fn() => $this->mediaType === MediaType::Image)
                 ->acceptedFileTypes(match ($this->mediaType) {
                     MediaType::Image, MediaType::Sticker => ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-                    MediaType::Video => ['video/mp4', 'video/3gpp', 'video/quicktime', 'video/avi'],
-                    MediaType::Audio => ['audio/mp3', 'audio/ogg', 'audio/wav', 'audio/aac', 'audio/m4a'],
-                    default => null,
+                    MediaType::Video                     => ['video/mp4', 'video/3gpp', 'video/quicktime', 'video/avi'],
+                    MediaType::Audio                     => ['audio/mp3', 'audio/ogg', 'audio/wav', 'audio/aac', 'audio/m4a'],
+                    default                              => null,
                 });
         }
 
@@ -320,15 +332,14 @@ class SendGowaMediaAction extends Action
             $caption = $data['caption'] ?? $this->resolveCaption($record);
             $upload = $this->resolveMediaUpload($data, $record);
 
-            Gowa::sendMedia(
-                $deviceId,
-                $recipient,
-                new MediaPayload(
+            Gowa::to($recipient)
+                ->from($deviceId)
+                ->media(new MediaPayload(
                     type: $this->mediaType,
                     upload: $upload,
                     caption: $caption,
-                )
-            );
+                ))
+                ->send();
 
             Notification::make()
                 ->title(__('gowa-filament::gowa-filament.notifications.message_sent'))

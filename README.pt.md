@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="art/banner.png" alt="gowa-filament Banner" width="100%" max-width="800">
+  <img src="art/gowa-filament-cover.png" alt="gowa-filament Banner" width="100%" max-width="800">
 
   # gowa-php/filament
 
@@ -36,8 +36,8 @@ Este pacote é a Fase 3 do ecossistema GOWA PHP e interage com o ecossistema ope
 * **Servidor GOWA em Execução**: Uma instância ativa do [go-whatsapp-web-multidevice (GOWA)](https://github.com/aldinokemal/go-whatsapp-web-multidevice). A variável `GOWA_BASE_URL` é **obrigatória** no seu arquivo `.env`.
 * **PHP**: `>= 8.2`
 * **Laravel**: `^10.0 | ^11.0 | ^12.0`
-* **Filament**: `^5.0` (Testado e Verificado) | `^3.0 | ^4.0` (Compatibilidade Arquitetural)
-* **Pacotes GOWA**: `gowa-php/sdk ^1.2`, `gowa-php/laravel ^1.2`
+* **Filament**: `^3.0 | ^4.0 | ^5.0`
+* **Pacotes GOWA**: `gowa-php/sdk ^1.0`, `gowa-php/laravel ^1.1`
 
 ---
 
@@ -98,6 +98,7 @@ public function panel(Panel $panel): Panel
 
 ## ✨ Principais Funcionalidades
 
+- **💬 WhatsApp Inbox & Chat em Tempo Real (`GowaConversationsPage`)**: Caixa de entrada bidirecional completa dentro do Filament com busca de contatos, filtro de não lidas, indicadores de status (enviado, entregue, lido com duplo tique azul), modal de envio de mídias e documentos, e alternador instantâneo entre instâncias conectadas.
 - **📱 Recurso de Instâncias GOWA (`GowaInstanceResource`)**: Visualize, crie, edite e gerencie instâncias WhatsApp conectadas com modais em slide-over e Infolists nativos do Filament.
 - **🔗 Sincronização de Webhook & Gerador de Secret**: Sincronize a URL do webhook e o segredo HMAC diretamente com o servidor GOWA Go sem desconectar. Inclui ação com gerador de segredo aleatório de 32 caracteres.
 - **📷 Modal com QR Code em Tempo Real**: Escaneie o QR Code diretamente no Filament com polling automático (`wire:poll.3s`).
@@ -114,8 +115,10 @@ public function panel(Panel $panel): Panel
   - 🔗 **Preview de Link**: Envio de links com preview Open-Graph automático.
   - 📊 **Enquete**: Criação de enquetes interativas com múltiplas opções.
   - 📡 **Status de Presença**: Atualização do status digitando (`composing`) ou gravando (`recording`).
+- **⚡ Actions Fluentes e Facade**: Envio intuitivo e expressivo de mensagens com encadeamento de métodos, seja via Facade Fluente do Laravel (`Gowa::to()->from()->text()->send()`) ou através da Action nativa do Filament (`SendGowaAction::make()->to()->from()->text()->direct()`). Suporta disparo direto no clique ou revisão em modal interativo.
 - **✉️ Ações Especializadas para Recursos**:
-  - `SendGowaMessageAction`: Envio rápido de mensagens de texto com templates dinâmicos.
+  - `SendGowaAction`: Action fluente unificada compatível com texto, imagens, vídeos, áudio, notas de voz, documentos, enquetes, contatos, localizações e callbacks fluentes customizados.
+  - `SendGowaMessageAction`: Envio rápido de mensagens de texto com templates dinâmicos e suporte a modal.
   - `SendGowaDocumentAction`: Envio de PDFs, faturas, contratos ou planilhas via caminho de arquivo ou URL.
   - `SendGowaMediaAction`: Envio de imagens, vídeos ou áudios com legendas personalizadas.
   - `UpdateWebhookAction`: Sincronização instantânea da URL e segredo HMAC no backend GOWA.
@@ -126,19 +129,25 @@ public function panel(Panel $panel): Panel
 
 ## 📸 Capturas de Tela
 
-### Instâncias do WhatsApp
+### WhatsApp Inbox & Chat em Tempo Real
+
+<p align="center">
+  <img src="art/inbox-widget.png" alt="WhatsApp Live Inbox & Chat no Filament" width="100%">
+</p>
+
+### Gerenciamento de Instâncias WhatsApp
 
 <p align="center">
   <img src="art/instances-list.png" alt="Lista de instâncias do WhatsApp no Filament" width="100%">
 </p>
 
-### Detalhes da instância
+### Modal de Conexão via QR Code
 
 <p align="center">
-  <img src="art/instance-details.png" alt="Slide-over de detalhes da instância do WhatsApp no Filament" width="100%">
+  <img src="art/qr-modal.png" alt="Modal com QR Code do WhatsApp no Filament" width="100%">
 </p>
 
-### Central de mensagens
+### Central de Teste de Mensagens
 
 <p align="center">
   <img src="art/messaging-center.png" alt="Central de mensagens do WhatsApp no Filament" width="100%">
@@ -146,44 +155,109 @@ public function panel(Panel $panel): Panel
 
 ---
 
-## 💡 Exemplos de Uso das Ações Especializadas
+## 💡 Exemplos de Uso das Actions do Filament e API Fluente
 
-### 1. Enviar Mensagem de Texto Rápida (`SendGowaMessageAction`)
+### 1. Action Fluente (`SendGowaAction`)
 
-Adicione uma ação de WhatsApp em qualquer tabela de recurso do Filament:
+A `SendGowaAction` oferece uma API encadeável e fluente direto nas suas tabelas e formulários Filament:
+
+#### Disparo Direto (Sem Modal):
+
+```php
+use Gowa\Filament\Actions\SendGowaAction;
+
+SendGowaAction::make()
+    ->to(fn ($record) => $record->phone_number)
+    ->text(fn ($record) => "Olá {$record->name}, seu pedido #{$record->id} foi confirmado com sucesso!")
+    ->direct(); // Envia imediatamente ao clicar
+```
+
+#### Confirmação com Modal e Formulário Pré-preenchido:
+
+```php
+use Gowa\Filament\Actions\SendGowaAction;
+
+SendGowaAction::make('contactCustomer')
+    ->label('Conversar no WhatsApp')
+    ->to(fn ($record) => $record->phone)
+    ->text(fn ($record) => "Olá {$record->first_name}, tudo bem? Sobre sua solicitação...");
+    // Abre um modal nativo do Filament permitindo que o operador revise ou edite a mensagem antes de enviar
+```
+
+#### Envio Fluente de Documentos, Faturas e Imagens:
+
+```php
+// Envio de Fatura em PDF
+SendGowaAction::make('sendInvoice')
+    ->to(fn ($record) => $record->customer_phone)
+    ->document(fn ($record) => $record->pdf_url, filename: 'fatura.pdf')
+    ->direct();
+
+// Envio de Imagem / Comprovante
+SendGowaAction::make('sendReceipt')
+    ->to(fn ($record) => $record->phone)
+    ->image(fn ($record) => $record->receipt_url, caption: 'Comprovante de pagamento')
+    ->direct();
+```
+
+#### Envio Customizado com Callback Fluente (`->fluent()`):
+
+```php
+use Gowa\Filament\Actions\SendGowaAction;
+use Gowa\Laravel\PendingMessage;
+
+SendGowaAction::make('sendFeedbackPoll')
+    ->fluent(fn (PendingMessage $msg, $record) => $msg
+        ->to($record->phone)
+        ->from($record->device_id)
+        ->poll('Como você avalia nosso atendimento?', ['Excelente', 'Bom', 'Regular', 'Ruim'])
+    )
+    ->direct();
+```
+
+### 2. Usando a Facade Fluente do Laravel em Qualquer Lugar do Filament
+
+Você também pode utilizar a Facade fluente do `gowa-php/laravel` em actions customizadas, lifecycles de formulários ou bulk actions:
+
+```php
+use Gowa\Laravel\Facades\Gowa;
+
+// Envio fluente de mensagem de texto
+Gowa::to($record->phone)
+    ->from($record->device_id)
+    ->text("O status do seu pedido foi atualizado para {$record->status}.")
+    ->send();
+
+// Envio fluente de documento
+Gowa::to($record->phone)
+    ->document(Storage::path('invoices/fatura-1001.pdf'))
+    ->send();
+```
+
+### 3. Ações Especializadas com Modal
+
+#### Envio de Mensagem de Texto (`SendGowaMessageAction`)
 
 ```php
 use Gowa\Filament\Actions\SendGowaMessageAction;
 
-public static function table(Table $table): Table
-{
-    return $table
-        ->columns([ ... ])
-        ->actions([
-            SendGowaMessageAction::make()
-                ->numberFrom('phone_number') // Resolve o telefone a partir do registro
-                ->message(fn ($record) => "Olá {$record->name}, seu pedido #{$record->id} foi enviado!"),
-        ]);
-}
+SendGowaMessageAction::make()
+    ->to(fn ($record) => $record->phone_number)
+    ->text(fn ($record) => "Olá {$record->name}, seu pedido #{$record->id} foi enviado!");
 ```
 
-### 2. Enviar Documento PDF ou Fatura (`SendGowaDocumentAction`)
-
-Envie faturas, contratos ou relatórios em PDF diretamente para os clientes:
+#### Envio de Documento PDF ou Fatura (`SendGowaDocumentAction`)
 
 ```php
 use Gowa\Filament\Actions\SendGowaDocumentAction;
 
 SendGowaDocumentAction::make('sendInvoice')
     ->label('Enviar Fatura em PDF')
-    ->numberFrom('customer.phone')
-    ->documentUrl(fn ($record) => $record->pdf_download_url)
-    ->filename(fn ($record) => "fatura-{$record->code}.pdf");
+    ->to(fn ($record) => $record->customer_phone)
+    ->document(fn ($record) => $record->pdf_download_url, filename: fn ($record) => "fatura-{$record->code}.pdf");
 ```
 
-### 3. Enviar Mídias / Fotos / Vídeos (`SendGowaMediaAction`)
-
-Envie comprovantes de pagamento, fotos de produtos ou anexos em vídeo com legenda:
+#### Envio de Mídias / Fotos / Vídeos (`SendGowaMediaAction`)
 
 ```php
 use Gowa\Filament\Actions\SendGowaMediaAction;
@@ -192,7 +266,7 @@ use Gowa\Sdk\Dto\MediaType;
 SendGowaMediaAction::make('sendReceipt')
     ->label('Enviar Comprovante')
     ->type(MediaType::Image)
-    ->numberFrom('client_phone')
+    ->to(fn ($record) => $record->client_phone)
     ->mediaFrom('receipt_path')
     ->caption('Aqui está o seu comprovante de pagamento.');
 ```

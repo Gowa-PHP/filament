@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Gowa\Filament\Pages\GowaMessagingPage;
 use Gowa\Laravel\Facades\Gowa;
 use Gowa\Laravel\Models\GowaInstance;
@@ -15,9 +17,9 @@ it('mounts GowaMessagingPage successfully', function () {
 
 it('sends text message from GowaMessagingPage', function () {
     GowaInstance::create([
-        'name' => 'Instance 01',
+        'name'      => 'Instance 01',
         'device_id' => 'device_01',
-        'status' => 'open',
+        'status'    => 'open',
     ]);
 
     $client = Mockery::mock(GowaClient::class);

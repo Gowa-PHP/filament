@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Gowa\Filament\Livewire\GowaQrCode;
 use Gowa\Sdk\Dto\Device;
 use Gowa\Sdk\Dto\Pairing;

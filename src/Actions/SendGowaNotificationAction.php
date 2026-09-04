@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Actions;
 
 use Closure;
@@ -37,7 +39,7 @@ class SendGowaNotificationAction extends Action
             ->color('warning')
             ->modalHeading(__('gowa-filament::gowa-filament.actions.send_notification', ['default' => 'Testar Laravel Notification Channel']))
             ->modalWidth(Width::Medium)
-            ->form(fn (self $action, ?Model $record): array => $action->getFormSchema($record))
+            ->form(fn(self $action, ?Model $record): array => $action->getFormSchema($record))
             ->action(function (array $data, self $action, ?Model $record): void {
                 $action->executeSendNotification($data, $record);
             });
@@ -172,7 +174,7 @@ class SendGowaNotificationAction extends Action
             $recipient = (string) ($data['to'] ?? '');
             $text = (string) ($data['message'] ?? '');
 
-            $notifiable = new class($deviceId, $recipient) {
+            $notifiable = new class ($deviceId, $recipient) {
                 use Notifiable;
 
                 public function __construct(private string $device, private string $phone) {}
@@ -183,7 +185,7 @@ class SendGowaNotificationAction extends Action
                 }
             };
 
-            $laravelNotification = new class($text) extends LaravelNotification {
+            $laravelNotification = new class ($text) extends LaravelNotification {
                 public function __construct(private string $text) {}
 
                 public function via(mixed $notifiable): array

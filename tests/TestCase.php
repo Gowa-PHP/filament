@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Tests;
 
 use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
@@ -66,9 +68,9 @@ abstract class TestCase extends Orchestra
 
         config()->set('database.default', 'testing');
         config()->set('database.connections.testing', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
 
         config()->set('gowa.base_url', 'https://gowa-api.test');
@@ -87,6 +89,38 @@ abstract class TestCase extends Orchestra
             $table->string('status')->default('close');
             $table->json('meta')->nullable();
             $table->timestamp('connected_at')->nullable();
+            $table->timestamps();
+        });
+
+        $app['db']->connection()->getSchemaBuilder()->create('gowa_conversations', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('instance_id')->constrained('gowa_instances')->cascadeOnDelete();
+            $table->string('contact_jid');
+            $table->string('contact_name')->nullable();
+            $table->string('contact_phone')->nullable();
+            $table->json('meta')->nullable();
+            $table->timestamp('last_message_at')->nullable();
+            $table->timestamps();
+
+            $table->unique(['instance_id', 'contact_jid']);
+        });
+
+        $app['db']->connection()->getSchemaBuilder()->create('gowa_messages', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('instance_id')->constrained('gowa_instances')->cascadeOnDelete();
+            $table->foreignId('conversation_id')->nullable()->constrained('gowa_conversations')->nullOnDelete();
+            $table->string('message_id')->index();
+            $table->string('direction')->default('inbound');
+            $table->string('status')->default('pending');
+            $table->string('type')->default('text');
+            $table->text('body')->nullable();
+            $table->string('media_url')->nullable();
+            $table->string('media_mime')->nullable();
+            $table->string('reply_to')->nullable();
+            $table->json('meta')->nullable();
+            $table->timestamp('sent_at')->nullable();
+            $table->timestamp('delivered_at')->nullable();
+            $table->timestamp('read_at')->nullable();
             $table->timestamps();
         });
     }

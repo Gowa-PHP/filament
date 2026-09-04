@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Resources\GowaInstanceResource\Actions;
 
 use Exception;
-use Filament\Notifications\Notification;
 use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Gowa\Laravel\Facades\Gowa;
 
 class DisconnectAction
