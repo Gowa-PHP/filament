@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Pages;
 
 use Exception;
@@ -55,9 +57,9 @@ class GowaMessagingPage extends Page implements HasForms
     {
         $bagInstance = match (true) {
             $bag instanceof MessageBagContract => $bag,
-            $bag instanceof Arrayable => new MessageBag($bag->toArray()),
-            is_array($bag) => new MessageBag($bag),
-            default => new MessageBag(),
+            $bag instanceof Arrayable          => new MessageBag($bag->toArray()),
+            is_array($bag)                     => new MessageBag($bag),
+            default                            => new MessageBag(),
         };
 
         \Livewire\store($this)->set('errorBag', $bagInstance);
@@ -102,13 +104,13 @@ class GowaMessagingPage extends Page implements HasForms
             ?? $modelClass::query()->value('device_id');
 
         $this->form->fill([
-            'device_id' => $defaultInstance,
-            'recipient_type' => 'private',
-            'to' => '',
-            'message_type' => 'text',
-            'is_voice' => true,
+            'device_id'        => $defaultInstance,
+            'recipient_type'   => 'private',
+            'to'               => '',
+            'message_type'     => 'text',
+            'is_voice'         => true,
             'selectable_count' => 1,
-            'presence_type' => 'composing',
+            'presence_type'    => 'composing',
         ]);
     }
 
@@ -133,14 +135,14 @@ class GowaMessagingPage extends Page implements HasForms
                                 ->native(false)
                                 ->options([
                                     'private' => 'Mensagem Privada (Número)',
-                                    'group' => 'Grupo (Group JID)',
+                                    'group'   => 'Grupo (Group JID)',
                                 ])
                                 ->default('private')
                                 ->required(),
 
                             TextInput::make('to')
                                 ->label(__('gowa-filament::gowa-filament.fields.recipient_number'))
-                                ->placeholder(fn ($get) => $get('recipient_type') === 'group' ? '12036304199999@g.us' : 'Ex: 5511999999999')
+                                ->placeholder(fn($get) => $get('recipient_type') === 'group' ? '12036304199999@g.us' : 'Ex: 5511999999999')
                                 ->prefixIcon('heroicon-o-phone')
                                 ->required(),
                         ]),
@@ -152,16 +154,16 @@ class GowaMessagingPage extends Page implements HasForms
                             ->label(__('gowa-filament::gowa-filament.fields.message_type'))
                             ->native(false)
                             ->options([
-                                'text' => '💬 Texto (Text)',
-                                'image' => '🖼️ Imagem (Image)',
-                                'video' => '🎥 Vídeo (Video)',
+                                'text'     => '💬 Texto (Text)',
+                                'image'    => '🖼️ Imagem (Image)',
+                                'video'    => '🎥 Vídeo (Video)',
                                 'document' => '📄 Documento (File)',
-                                'audio' => '🎙️ Áudio / Voz (Audio PTT)',
-                                'sticker' => '🏷️ Sticker',
-                                'contact' => '👤 Contato (Contact)',
+                                'audio'    => '🎙️ Áudio / Voz (Audio PTT)',
+                                'sticker'  => '🏷️ Sticker',
+                                'contact'  => '👤 Contato (Contact)',
                                 'location' => '📍 Localização (Location)',
-                                'link' => '🔗 Link com Preview (Link)',
-                                'poll' => '📊 Enquete (Poll)',
+                                'link'     => '🔗 Link com Preview (Link)',
+                                'poll'     => '📊 Enquete (Poll)',
                                 'presence' => '📡 Status de Presença (Presence)',
                             ])
                             ->live()
@@ -172,13 +174,13 @@ class GowaMessagingPage extends Page implements HasForms
                             ->label(__('gowa-filament::gowa-filament.fields.message'))
                             ->placeholder('Digite sua mensagem de WhatsApp...')
                             ->rows(4)
-                            ->visible(fn ($get) => $get('message_type') === 'text')
-                            ->required(fn ($get) => $get('message_type') === 'text'),
+                            ->visible(fn($get) => $get('message_type') === 'text')
+                            ->required(fn($get) => $get('message_type') === 'text'),
 
                         TextInput::make('reply_to')
                             ->label(__('gowa-filament::gowa-filament.fields.reply_to'))
                             ->placeholder('Ex: 3EB0C1234567890')
-                            ->visible(fn ($get) => $get('message_type') === 'text'),
+                            ->visible(fn($get) => $get('message_type') === 'text'),
 
                         // Filament Native FileUpload Component with Image Editor and Explicit Document Mimes
                         FileUpload::make('media_file')
@@ -187,12 +189,12 @@ class GowaMessagingPage extends Page implements HasForms
                             ->visibility('public')
                             ->maxSize(51200)
                             ->preserveFilenames()
-                            ->imageEditor(fn ($get) => $get('message_type') === 'image')
-                            ->acceptedFileTypes(fn ($get) => match ($get('message_type')) {
+                            ->imageEditor(fn($get) => $get('message_type') === 'image')
+                            ->acceptedFileTypes(fn($get) => match ($get('message_type')) {
                                 'image', 'sticker' => ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-                                'video' => ['video/mp4', 'video/3gpp', 'video/quicktime', 'video/avi', 'video/x-msvideo'],
-                                'audio' => ['audio/mp3', 'audio/ogg', 'audio/wav', 'audio/aac', 'audio/m4a', 'audio/mp4'],
-                                'document' => [
+                                'video'            => ['video/mp4', 'video/3gpp', 'video/quicktime', 'video/avi', 'video/x-msvideo'],
+                                'audio'            => ['audio/mp3', 'audio/ogg', 'audio/wav', 'audio/aac', 'audio/m4a', 'audio/mp4'],
+                                'document'         => [
                                     'application/pdf',
                                     'text/csv',
                                     'text/plain',
@@ -208,42 +210,42 @@ class GowaMessagingPage extends Page implements HasForms
                                 ],
                                 default => null,
                             })
-                            ->visible(fn ($get) => in_array($get('message_type'), ['image', 'video', 'document', 'audio', 'sticker'], true)),
+                            ->visible(fn($get) => in_array($get('message_type'), ['image', 'video', 'document', 'audio', 'sticker'], true)),
 
                         // External URL fallback
                         TextInput::make('media_url')
                             ->label(__('gowa-filament::gowa-filament.fields.media_url'))
                             ->placeholder('https://exemplo.com/midia.jpg ou /caminho/local/midia.jpg')
                             ->prefixIcon('heroicon-o-link')
-                            ->visible(fn ($get) => in_array($get('message_type'), ['image', 'video', 'document', 'audio', 'sticker'], true)),
+                            ->visible(fn($get) => in_array($get('message_type'), ['image', 'video', 'document', 'audio', 'sticker'], true)),
 
                         TextInput::make('caption')
                             ->label(__('gowa-filament::gowa-filament.fields.caption'))
                             ->placeholder('Legenda da mídia (opcional)')
-                            ->visible(fn ($get) => in_array($get('message_type'), ['image', 'video'], true)),
+                            ->visible(fn($get) => in_array($get('message_type'), ['image', 'video'], true)),
 
                         TextInput::make('filename')
                             ->label(__('gowa-filament::gowa-filament.fields.filename'))
                             ->placeholder('documento.pdf')
-                            ->visible(fn ($get) => $get('message_type') === 'document'),
+                            ->visible(fn($get) => $get('message_type') === 'document'),
 
                         Toggle::make('is_voice')
                             ->label(__('gowa-filament::gowa-filament.fields.is_voice'))
                             ->default(true)
-                            ->visible(fn ($get) => $get('message_type') === 'audio'),
+                            ->visible(fn($get) => $get('message_type') === 'audio'),
 
                         // Contact Fields
                         Grid::make(2)->schema([
                             TextInput::make('contact_name')
                                 ->label(__('gowa-filament::gowa-filament.fields.contact_name'))
                                 ->placeholder('Ex: João Silva')
-                                ->required(fn ($get) => $get('message_type') === 'contact'),
+                                ->required(fn($get) => $get('message_type') === 'contact'),
 
                             TextInput::make('contact_phone')
                                 ->label(__('gowa-filament::gowa-filament.fields.contact_phone'))
                                 ->placeholder('Ex: 5511988888888')
-                                ->required(fn ($get) => $get('message_type') === 'contact'),
-                        ])->visible(fn ($get) => $get('message_type') === 'contact'),
+                                ->required(fn($get) => $get('message_type') === 'contact'),
+                        ])->visible(fn($get) => $get('message_type') === 'contact'),
 
                         // Location Fields
                         Grid::make(2)->schema([
@@ -251,13 +253,13 @@ class GowaMessagingPage extends Page implements HasForms
                                 ->label(__('gowa-filament::gowa-filament.fields.latitude'))
                                 ->placeholder('-23.550520')
                                 ->numeric()
-                                ->required(fn ($get) => $get('message_type') === 'location'),
+                                ->required(fn($get) => $get('message_type') === 'location'),
 
                             TextInput::make('longitude')
                                 ->label(__('gowa-filament::gowa-filament.fields.longitude'))
                                 ->placeholder('-46.633308')
                                 ->numeric()
-                                ->required(fn ($get) => $get('message_type') === 'location'),
+                                ->required(fn($get) => $get('message_type') === 'location'),
 
                             TextInput::make('location_name')
                                 ->label(__('gowa-filament::gowa-filament.fields.location_name'))
@@ -266,7 +268,7 @@ class GowaMessagingPage extends Page implements HasForms
                             TextInput::make('address')
                                 ->label(__('gowa-filament::gowa-filament.fields.address'))
                                 ->placeholder('Ex: Av. Paulista, 1000 - São Paulo, SP'),
-                        ])->visible(fn ($get) => $get('message_type') === 'location'),
+                        ])->visible(fn($get) => $get('message_type') === 'location'),
 
                         // Link Fields
                         Grid::make(2)->schema([
@@ -274,19 +276,19 @@ class GowaMessagingPage extends Page implements HasForms
                                 ->label(__('gowa-filament::gowa-filament.fields.url'))
                                 ->placeholder('https://atlantida-code.com.br')
                                 ->url()
-                                ->required(fn ($get) => $get('message_type') === 'link'),
+                                ->required(fn($get) => $get('message_type') === 'link'),
 
                             TextInput::make('link_text')
                                 ->label(__('gowa-filament::gowa-filament.fields.link_text'))
                                 ->placeholder('Confira nosso novo site!'),
-                        ])->visible(fn ($get) => $get('message_type') === 'link'),
+                        ])->visible(fn($get) => $get('message_type') === 'link'),
 
                         // Poll Fields
                         Grid::make(1)->schema([
                             TextInput::make('question')
                                 ->label(__('gowa-filament::gowa-filament.fields.question'))
                                 ->placeholder('Qual o melhor horário para atendimento?')
-                                ->required(fn ($get) => $get('message_type') === 'poll'),
+                                ->required(fn($get) => $get('message_type') === 'poll'),
 
                             Repeater::make('poll_options')
                                 ->label(__('gowa-filament::gowa-filament.fields.poll_options'))
@@ -310,7 +312,7 @@ class GowaMessagingPage extends Page implements HasForms
                                     3 => '3 opções',
                                 ])
                                 ->default(1),
-                        ])->visible(fn ($get) => $get('message_type') === 'poll'),
+                        ])->visible(fn($get) => $get('message_type') === 'poll'),
 
                         // Presence Fields
                         Select::make('presence_type')
@@ -319,10 +321,10 @@ class GowaMessagingPage extends Page implements HasForms
                             ->options([
                                 'composing' => '⌨️ Digitando... (Composing)',
                                 'recording' => '🎙️ Gravando áudio... (Recording)',
-                                'paused' => '⏸️ Pausado (Paused)',
+                                'paused'    => '⏸️ Pausado (Paused)',
                             ])
                             ->default('composing')
-                            ->visible(fn ($get) => $get('message_type') === 'presence'),
+                            ->visible(fn($get) => $get('message_type') === 'presence'),
                     ]),
             ])
             ->statePath('data');
@@ -416,7 +418,7 @@ class GowaMessagingPage extends Page implements HasForms
                         type: MediaType::Image,
                         upload: $this->resolveMediaUpload($data),
                         caption: $data['caption'] ?? null,
-                    )
+                    ),
                 ),
 
                 'video' => Gowa::sendMedia(
@@ -426,7 +428,7 @@ class GowaMessagingPage extends Page implements HasForms
                         type: MediaType::Video,
                         upload: $this->resolveMediaUpload($data),
                         caption: $data['caption'] ?? null,
-                    )
+                    ),
                 ),
 
                 'document' => Gowa::sendMedia(
@@ -435,7 +437,7 @@ class GowaMessagingPage extends Page implements HasForms
                     new MediaPayload(
                         type: MediaType::Document,
                         upload: $this->resolveMediaUpload($data),
-                    )
+                    ),
                 ),
 
                 'audio' => Gowa::sendMedia(
@@ -445,7 +447,7 @@ class GowaMessagingPage extends Page implements HasForms
                         type: MediaType::Audio,
                         upload: $this->resolveMediaUpload($data),
                         voice: (bool) ($data['is_voice'] ?? true),
-                    )
+                    ),
                 ),
 
                 'sticker' => Gowa::sendMedia(
@@ -454,13 +456,13 @@ class GowaMessagingPage extends Page implements HasForms
                     new MediaPayload(
                         type: MediaType::Sticker,
                         upload: $this->resolveMediaUpload($data),
-                    )
+                    ),
                 ),
 
                 'contact' => Gowa::sendContacts(
                     $deviceId,
                     $to,
-                    [new ContactCard(name: (string) $data['contact_name'], phones: [['phone' => (string) $data['contact_phone']]])]
+                    [new ContactCard(name: (string) $data['contact_name'], phones: [['phone' => (string) $data['contact_phone']]])],
                 ),
 
                 'location' => Gowa::sendLocation(
@@ -469,7 +471,7 @@ class GowaMessagingPage extends Page implements HasForms
                     (float) $data['latitude'],
                     (float) $data['longitude'],
                     $data['location_name'] ?? null,
-                    $data['address'] ?? null
+                    $data['address'] ?? null,
                 ),
 
                 'link' => Gowa::sendLink($deviceId, $to, (string) $data['url'], $data['link_text'] ?? null),
@@ -479,16 +481,16 @@ class GowaMessagingPage extends Page implements HasForms
                     $to,
                     (string) $data['question'],
                     array_values(array_filter(array_column($data['poll_options'] ?? [], 'option_name'))),
-                    (int) ($data['selectable_count'] ?? 1)
+                    (int) ($data['selectable_count'] ?? 1),
                 ),
 
                 'presence' => Gowa::setPresence(
                     $deviceId,
                     match ($data['presence_type'] ?? 'composing') {
                         'recording' => Presence::Recording,
-                        'paused' => Presence::Paused,
-                        default => Presence::Composing,
-                    }
+                        'paused'    => Presence::Paused,
+                        default     => Presence::Composing,
+                    },
                 ),
 
                 default => throw new Exception("Tipo de mensagem '{$type}' não suportado."),
@@ -496,32 +498,32 @@ class GowaMessagingPage extends Page implements HasForms
 
             // Reset media and message fields after successful dispatch
             $this->form->fill([
-                'device_id' => $deviceId,
+                'device_id'      => $deviceId,
                 'recipient_type' => $data['recipient_type'] ?? 'private',
-                'to' => $to,
-                'message_type' => $type,
-                'message' => '',
-                'reply_to' => '',
-                'media_file' => null,
-                'media_url' => '',
-                'caption' => '',
-                'filename' => '',
-                'is_voice' => true,
-                'contact_name' => '',
-                'contact_phone' => '',
-                'latitude' => '',
-                'longitude' => '',
-                'location_name' => '',
-                'address' => '',
-                'url' => '',
-                'link_text' => '',
-                'question' => '',
-                'poll_options' => [
+                'to'             => $to,
+                'message_type'   => $type,
+                'message'        => '',
+                'reply_to'       => '',
+                'media_file'     => null,
+                'media_url'      => '',
+                'caption'        => '',
+                'filename'       => '',
+                'is_voice'       => true,
+                'contact_name'   => '',
+                'contact_phone'  => '',
+                'latitude'       => '',
+                'longitude'      => '',
+                'location_name'  => '',
+                'address'        => '',
+                'url'            => '',
+                'link_text'      => '',
+                'question'       => '',
+                'poll_options'   => [
                     ['option_name' => 'Manhã (08h - 12h)'],
                     ['option_name' => 'Tarde (13h - 18h)'],
                 ],
                 'selectable_count' => 1,
-                'presence_type' => 'composing',
+                'presence_type'    => 'composing',
             ]);
 
             Notification::make()
@@ -550,6 +552,6 @@ class GowaMessagingPage extends Page implements HasForms
             ->modalHeading(__('gowa-filament::gowa-filament.messaging.curl_heading'))
             ->modalDescription(__('gowa-filament::gowa-filament.messaging.curl_desc'))
             ->modalWidth(Width::Medium)
-            ->action(fn () => null);
+            ->action(fn() => null);
     }
 }
