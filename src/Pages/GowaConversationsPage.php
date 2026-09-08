@@ -397,8 +397,11 @@ class GowaConversationsPage extends Page
                 ]);
 
                 $conversation->update(['last_message_at' => now()]);
-            } catch (\Throwable) {
-                Log::warning('GOWA local message persistence failed.');
+            } catch (\Throwable $e) {
+                Log::warning('GOWA local message persistence failed.', [
+                    'exception_class' => get_class($e),
+                    'conversation_id' => $conversation->id,
+                ]);
             }
 
             Notification::make()
@@ -537,8 +540,11 @@ class GowaConversationsPage extends Page
                 ]);
 
                 $conversation->update(['last_message_at' => now()]);
-            } catch (\Throwable) {
-                Log::warning('GOWA local attachment persistence failed.');
+            } catch (\Throwable $e) {
+                Log::warning('GOWA local attachment persistence failed.', [
+                    'exception_class' => get_class($e),
+                    'conversation_id' => $conversation->id,
+                ]);
             }
 
             Notification::make()
@@ -586,14 +592,16 @@ class GowaConversationsPage extends Page
 
             // Call GOWA API for external WhatsApp read receipts (capped to batch size)
             foreach ($unreadMessages as $message) {
+                if (! $conversation->instance || empty($message->message_id)) {
+                    continue;
+                }
+
                 try {
-                    if ($conversation->instance && $message->message_id) {
-                        Gowa::markRead(
-                            $conversation->instance->device_id,
-                            $conversation->contact_jid,
-                            $message->message_id,
-                        );
-                    }
+                    Gowa::markRead(
+                        $conversation->instance->device_id,
+                        $conversation->contact_jid,
+                        $message->message_id,
+                    );
 
                     $markedIds[] = $message->id;
                 } catch (\Throwable $e) {

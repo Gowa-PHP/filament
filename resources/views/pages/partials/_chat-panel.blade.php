@@ -112,22 +112,26 @@
         wire:poll.4s
         x-data="{
             observer: null,
+            isNearBottom: true,
+            checkNearBottom() {
+                const el = this.$refs.chatContainer;
+                if (el) {
+                    this.isNearBottom = (el.scrollHeight - el.scrollTop - el.clientHeight) < 120;
+                }
+            },
             scrollToBottom() {
                 this.$nextTick(() => {
                     if (this.$refs.chatContainer) {
                         this.$refs.chatContainer.scrollTop = this.$refs.chatContainer.scrollHeight;
+                        this.isNearBottom = true;
                     }
                 });
             },
             init() {
                 this.scrollToBottom();
                 this.observer = new MutationObserver(() => {
-                    const el = this.$refs.chatContainer;
-                    if (el) {
-                        const isNearBottom = (el.scrollHeight - el.scrollTop - el.clientHeight) < 120;
-                        if (isNearBottom) {
-                            this.scrollToBottom();
-                        }
+                    if (this.isNearBottom) {
+                        this.scrollToBottom();
                     }
                 });
                 this.observer.observe(this.$refs.chatContainer, { childList: true, subtree: true });
@@ -139,6 +143,7 @@
             }
         }"
         x-ref="chatContainer"
+        @scroll.passive="checkNearBottom()"
     >
         @php
             $lastDate = null;

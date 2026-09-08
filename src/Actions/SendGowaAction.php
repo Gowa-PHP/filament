@@ -452,8 +452,17 @@ class SendGowaAction extends Action
                     throw new Exception('Latitude e longitude são obrigatórias para o envio de localização.');
                 }
 
+                if (! is_numeric($rawLat) || ! is_numeric($rawLng)) {
+                    throw new Exception('Latitude e longitude devem ser valores numéricos válidos.');
+                }
+
                 $lat = (float) $rawLat;
                 $lng = (float) $rawLng;
+
+                if (! is_finite($lat) || ! is_finite($lng) || $lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
+                    throw new Exception('Latitude deve estar entre -90 e 90 e longitude entre -180 e 180.');
+                }
+
                 $pending->location($lat, $lng)->send();
             } elseif ($this->contactConfig !== null) {
                 $name = (string) $this->resolveValue($this->contactConfig['name'], $record);

@@ -368,3 +368,43 @@ it('falls back to default filename when empty filename is submitted in document 
         'filename' => '',
     ], null);
 });
+
+it('rejects non-numeric coordinates in SendGowaAction location send', function () {
+    $client = Mockery::mock(GowaClient::class);
+    $client->shouldNotReceive('sendLocation');
+
+    Gowa::swap($client);
+
+    $action = SendGowaAction::make()
+        ->from('device_test_01')
+        ->to('5511999999999')
+        ->location('invalid-lat', 'invalid-lng')
+        ->direct();
+
+    $action->executeSend([], null);
+});
+
+it('rejects out-of-range coordinates in SendGowaAction location send', function () {
+    $client = Mockery::mock(GowaClient::class);
+    $client->shouldNotReceive('sendLocation');
+
+    Gowa::swap($client);
+
+    // Latitude outside [-90, 90]
+    $actionLat = SendGowaAction::make()
+        ->from('device_test_01')
+        ->to('5511999999999')
+        ->location(95.0, 45.0)
+        ->direct();
+
+    $actionLat->executeSend([], null);
+
+    // Longitude outside [-180, 180]
+    $actionLng = SendGowaAction::make()
+        ->from('device_test_01')
+        ->to('5511999999999')
+        ->location(-23.55, 195.0)
+        ->direct();
+
+    $actionLng->executeSend([], null);
+});

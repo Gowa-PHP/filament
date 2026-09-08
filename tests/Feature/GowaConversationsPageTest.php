@@ -318,6 +318,31 @@ it('does not mark message as read locally if GOWA markRead fails', function () {
         ->and($message->fresh()->status)->toBe(\Gowa\Laravel\Enums\GowaMessageStatus::Delivered);
 });
 
+it('does not mark message as read and does not call markRead when message_id is empty', function () {
+    $client = Mockery::mock(\Gowa\Sdk\GowaClient::class);
+    $client->shouldNotReceive('markRead');
+
+    \Gowa\Laravel\Facades\Gowa::swap($client);
+
+    $message = GowaMessage::create([
+        'instance_id'     => $this->instance->id,
+        'conversation_id' => $this->conversation->id,
+        'message_id'      => '',
+        'direction'       => 'inbound',
+        'status'          => 'delivered',
+        'type'            => 'text',
+        'body'            => 'Message without external ID',
+        'sent_at'         => now(),
+        'read_at'         => null,
+    ]);
+
+    livewire(GowaConversationsPage::class)
+        ->call('markConversationRead', $this->conversation->id);
+
+    expect($message->fresh()->read_at)->toBeNull()
+        ->and($message->fresh()->status)->toBe(\Gowa\Laravel\Enums\GowaMessageStatus::Delivered);
+});
+
 it('resolves latest message by sent_at as primary ordering', function () {
     // Newer message inserted first
     GowaMessage::create([
@@ -331,7 +356,7 @@ it('resolves latest message by sent_at as primary ordering', function () {
         'sent_at'         => now()->subMinute(),
     ]);
 
-    // Older message inserted afterwards (higher id, older sent_at)
+    // Older message inserted second
     GowaMessage::create([
         'instance_id'     => $this->instance->id,
         'conversation_id' => $this->conversation->id,
@@ -340,7 +365,7 @@ it('resolves latest message by sent_at as primary ordering', function () {
         'status'          => 'delivered',
         'type'            => 'text',
         'body'            => 'Older message',
-        'sent_at'         => now()->subHour(),
+        'sent_at'         => now()->subMinutes(10),
     ]);
 
     $conversation = GowaConversation::with('latestMessage')->find($this->conversation->id);
@@ -350,6 +375,8 @@ it('resolves latest message by sent_at as primary ordering', function () {
 });
 
 it('caches negative result when avatar is absent to avoid repeated external calls', function () {
+    cache()->forget("gowa_avatar_{$this->instance->device_id}");
+
     $this->instance->phone_number = '5511999999999';
     $this->instance->save();
 

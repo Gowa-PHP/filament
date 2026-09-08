@@ -117,6 +117,37 @@ it('executes send document action via Closure returning HTTPS URL', function () 
     ], $dummyRecord);
 });
 
+it('executes send document action with empty data array resolving URL from documentUrlResolver', function () {
+    $client = Mockery::mock(GowaClient::class);
+    $client->shouldReceive('sendMedia')
+        ->withArgs(function ($deviceId, $to, MediaPayload $payload) {
+            return $deviceId === 'device_test_01'
+                && $to === '5511999999999'
+                && $payload->type === MediaType::Document
+                && $payload->upload?->source === 'https://example.com/invoice.pdf';
+        })
+        ->once()
+        ->andReturn(new SentMessage(providerMessageId: 'msg_doc_closure_empty_data', raw: []));
+
+    Gowa::swap($client);
+
+    $dummyRecord = new class () extends Model {
+        protected $attributes = [
+            'id'           => 1,
+            'device_id'    => 'device_test_01',
+            'phone_number' => '5511999999999',
+            'pdf_url'      => 'https://example.com/invoice.pdf',
+        ];
+    };
+
+    $action = SendGowaDocumentAction::make()
+        ->instanceFromRecord()
+        ->numberFrom('phone_number')
+        ->document(fn($record) => $record->pdf_url, 'invoice.pdf');
+
+    $action->executeSendDocument([], $dummyRecord);
+});
+
 it('executes send media action via URL', function () {
     $client = Mockery::mock(GowaClient::class);
     $client->shouldReceive('sendMedia')

@@ -280,6 +280,8 @@ class SendGowaMediaAction extends Action
             }
         } elseif (! empty($data['media_url'])) {
             $mediaPath = trim((string) $data['media_url']);
+        } elseif ($this->mediaUrlResolver !== null && ($resolvedUrl = $this->resolveMediaUrl($record))) {
+            $mediaPath = trim((string) $resolvedUrl);
         } elseif ($this->mediaFileResolver !== null && $record !== null) {
             $resolvedFile = $this->mediaFileResolver instanceof Closure
                 ? call_user_func($this->mediaFileResolver, $record)

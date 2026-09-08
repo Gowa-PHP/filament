@@ -306,6 +306,8 @@ class SendGowaDocumentAction extends Action
             }
         } elseif (! empty($data['document_url'])) {
             $mediaPath = trim((string) $data['document_url']);
+        } elseif ($this->documentUrlResolver !== null && ($resolvedUrl = $this->resolveDocumentUrl($record))) {
+            $mediaPath = trim((string) $resolvedUrl);
         } elseif ($this->documentFileResolver !== null && $record !== null) {
             $resolvedFile = $this->documentFileResolver instanceof Closure
                 ? call_user_func($this->documentFileResolver, $record)
