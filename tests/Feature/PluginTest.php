@@ -52,3 +52,23 @@ it('does not register components disabled through fluent configuration', functio
         ->and($panel->getPages())->not->toContain(GowaConversationsPage::class)
         ->and($panel->getWidgets())->not->toContain(GowaDeviceStatusWidget::class);
 });
+
+it('supports custom authorization callbacks for conversations and messaging', function () {
+    $plugin = GowaPlugin::make()
+        ->authorizeConversationsUsing(fn() => false)
+        ->authorizeMessagingUsing(fn() => true);
+
+    expect($plugin->getConversationsAuthorizationCallback())->not->toBeNull()
+        ->and($plugin->getMessagingAuthorizationCallback())->not->toBeNull()
+        ->and(call_user_func($plugin->getConversationsAuthorizationCallback()))->toBeFalse()
+        ->and(call_user_func($plugin->getMessagingAuthorizationCallback()))->toBeTrue();
+});
+
+it('fails closed when authorization callback throws an exception', function () {
+    $plugin = filament()->getPlugin('gowa-filament');
+    $plugin->authorizeConversationsUsing(fn() => throw new \RuntimeException('Auth service unavailable'));
+    $plugin->authorizeMessagingUsing(fn() => throw new \RuntimeException('Auth service unavailable'));
+
+    expect(GowaConversationsPage::canAccess())->toBeFalse()
+        ->and(GowaMessagingPage::canAccess())->toBeFalse();
+});

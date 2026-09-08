@@ -318,3 +318,93 @@ it('falls back to first open instance when device_id not specified', function ()
 
     $action->executeSend([], null);
 });
+
+it('treats string resolver as record attribute rather than invoking global PHP functions', function () {
+    $record = new \Gowa\Laravel\Models\GowaInstance([
+        'device_id' => 'device_time_01',
+        'name'      => 'time',
+    ]);
+
+    $action = SendGowaAction::make()
+        ->to('name')
+        ->from('device_id')
+        ->text('Hello!');
+
+    expect($action->resolveTo($record))->toBe('time');
+    expect($action->resolveDeviceId($record))->toBe('device_time_01');
+});
+
+it('does not send location when coordinates are missing and notifies error', function () {
+    $client = Mockery::mock(GowaClient::class);
+    $client->shouldNotReceive('sendLocation');
+
+    Gowa::swap($client);
+
+    $action = SendGowaAction::make()
+        ->from('device_test_01')
+        ->to('5511999999999')
+        ->location(fn() => null, fn() => null)
+        ->direct();
+
+    $action->executeSend([], null);
+});
+
+it('falls back to default filename when empty filename is submitted in document data', function () {
+    $client = Mockery::mock(GowaClient::class);
+    $client->shouldReceive('sendMedia')
+        ->withArgs(fn($deviceId, $to, \Gowa\Sdk\Dto\MediaPayload $payload) => $deviceId === 'device_test_01' && $to === '5511999999999' && $payload->upload?->filename === 'default_doc.pdf')
+        ->once()
+        ->andReturn(new SentMessage(providerMessageId: 'msg_doc_fallback', raw: []));
+
+    Gowa::swap($client);
+
+    $action = SendGowaAction::make()
+        ->from('device_test_01')
+        ->to('5511999999999')
+        ->document('https://example.com/invoice.pdf', filename: 'default_doc.pdf')
+        ->direct();
+
+    $action->executeSend([
+        'filename' => '',
+    ], null);
+});
+
+it('rejects non-numeric coordinates in SendGowaAction location send', function () {
+    $client = Mockery::mock(GowaClient::class);
+    $client->shouldNotReceive('sendLocation');
+
+    Gowa::swap($client);
+
+    $action = SendGowaAction::make()
+        ->from('device_test_01')
+        ->to('5511999999999')
+        ->location('invalid-lat', 'invalid-lng')
+        ->direct();
+
+    $action->executeSend([], null);
+});
+
+it('rejects out-of-range coordinates in SendGowaAction location send', function () {
+    $client = Mockery::mock(GowaClient::class);
+    $client->shouldNotReceive('sendLocation');
+
+    Gowa::swap($client);
+
+    // Latitude outside [-90, 90]
+    $actionLat = SendGowaAction::make()
+        ->from('device_test_01')
+        ->to('5511999999999')
+        ->location(95.0, 45.0)
+        ->direct();
+
+    $actionLat->executeSend([], null);
+
+    // Longitude outside [-180, 180]
+    $actionLng = SendGowaAction::make()
+        ->from('device_test_01')
+        ->to('5511999999999')
+        ->location(-23.55, 195.0)
+        ->direct();
+
+    $actionLng->executeSend([], null);
+});

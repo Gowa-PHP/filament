@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gowa\Filament;
 
+use Closure;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Gowa\Filament\Pages\GowaConversationsPage;
@@ -17,6 +18,8 @@ class GowaPlugin implements Plugin
     protected bool $hasDeviceStatusWidget = true;
     protected bool $hasMessagingPage = true;
     protected bool $hasConversationsPage = true;
+    protected ?Closure $conversationsAuthorizationCallback = null;
+    protected ?Closure $messagingAuthorizationCallback = null;
 
     public function getId(): string
     {
@@ -82,6 +85,30 @@ class GowaPlugin implements Plugin
     public function hasConversationsPage(): bool
     {
         return $this->hasConversationsPage;
+    }
+
+    public function authorizeConversationsUsing(?Closure $callback): static
+    {
+        $this->conversationsAuthorizationCallback = $callback;
+
+        return $this;
+    }
+
+    public function getConversationsAuthorizationCallback(): ?Closure
+    {
+        return $this->conversationsAuthorizationCallback;
+    }
+
+    public function authorizeMessagingUsing(?Closure $callback): static
+    {
+        $this->messagingAuthorizationCallback = $callback;
+
+        return $this;
+    }
+
+    public function getMessagingAuthorizationCallback(): ?Closure
+    {
+        return $this->messagingAuthorizationCallback;
     }
 
     public function register(Panel $panel): void

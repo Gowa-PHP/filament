@@ -203,7 +203,7 @@ class SendGowaAction extends Action
         return $this;
     }
 
-    public function location(float|Closure $lat, float|Closure|null $lng = null): static
+    public function location(float|string|Closure $lat, float|string|Closure|null $lng = null): static
     {
         $this->locationConfig = [
             'lat' => $lat,
@@ -281,7 +281,7 @@ class SendGowaAction extends Action
             return $record?->phone_number ?? $record?->phone ?? null;
         }
 
-        if (is_callable($this->toResolver)) {
+        if ($this->toResolver instanceof Closure) {
             return (string) call_user_func($this->toResolver, $record);
         }
 
@@ -305,8 +305,15 @@ class SendGowaAction extends Action
             return null;
         }
 
-        if (is_callable($this->fromResolver)) {
+        if ($this->fromResolver instanceof Closure) {
             return (string) call_user_func($this->fromResolver, $record);
+        }
+
+        if (is_string($this->fromResolver) && $record !== null) {
+            $fromData = data_get($record, $this->fromResolver);
+            if (! empty($fromData)) {
+                return (string) $fromData;
+            }
         }
 
         return (string) $this->fromResolver;
@@ -347,7 +354,7 @@ class SendGowaAction extends Action
             $schema[] = TextInput::make('filename')
                 ->label(__('gowa-filament::gowa-filament.fields.filename'))
                 ->placeholder('documento.pdf')
-                ->default(is_callable($this->documentConfig['filename']) ? call_user_func($this->documentConfig['filename'], $record) : $this->documentConfig['filename']);
+                ->default($this->documentConfig['filename'] instanceof Closure ? call_user_func($this->documentConfig['filename'], $record) : $this->documentConfig['filename']);
         } elseif ($this->imageConfig !== null || $this->videoConfig !== null) {
             $schema[] = TextInput::make('media_url')
                 ->label(__('gowa-filament::gowa-filament.fields.media_url'))
@@ -358,7 +365,7 @@ class SendGowaAction extends Action
                 ->label(__('gowa-filament::gowa-filament.fields.caption'))
                 ->placeholder('Legenda da imagem/vídeo...');
         } else {
-            $resolvedText = is_callable($this->textResolver)
+            $resolvedText = $this->textResolver instanceof Closure
                 ? (string) call_user_func($this->textResolver, $record)
                 : (string) $this->textResolver;
 
@@ -398,12 +405,12 @@ class SendGowaAction extends Action
             $pending = Gowa::to($to)->from($deviceId);
 
             if ($this->diskResolver !== null) {
-                $disk = is_callable($this->diskResolver) ? (string) call_user_func($this->diskResolver, $record) : (string) $this->diskResolver;
+                $disk = $this->diskResolver instanceof Closure ? (string) call_user_func($this->diskResolver, $record) : (string) $this->diskResolver;
                 $pending->disk($disk);
             }
 
             if ($this->replyToResolver !== null) {
-                $replyTo = is_callable($this->replyToResolver) ? (string) call_user_func($this->replyToResolver, $record) : (string) $this->replyToResolver;
+                $replyTo = $this->replyToResolver instanceof Closure ? (string) call_user_func($this->replyToResolver, $record) : (string) $this->replyToResolver;
                 $pending->replyTo($replyTo);
             }
 
@@ -415,7 +422,9 @@ class SendGowaAction extends Action
                 }
             } elseif ($this->documentConfig !== null) {
                 $file = ! empty($data['document_url']) ? $data['document_url'] : $this->resolveValue($this->documentConfig['file'], $record);
-                $filename = $data['filename'] ?? $this->resolveValue($this->documentConfig['filename'], $record);
+                $filename = ! empty($data['filename'])
+                    ? $data['filename']
+                    : $this->resolveValue($this->documentConfig['filename'], $record);
                 $caption = $this->resolveValue($this->documentConfig['caption'], $record);
 
                 $pending->document($file, filename: $filename, caption: $caption)->send();
@@ -436,8 +445,24 @@ class SendGowaAction extends Action
                 $file = $this->resolveValue($this->voiceFile, $record);
                 $pending->voice($file)->send();
             } elseif ($this->locationConfig !== null) {
-                $lat = (float) $this->resolveValue($this->locationConfig['lat'], $record);
-                $lng = (float) $this->resolveValue($this->locationConfig['lng'], $record);
+                $rawLat = $this->resolveValue($this->locationConfig['lat'], $record);
+                $rawLng = $this->resolveValue($this->locationConfig['lng'], $record);
+
+                if ($rawLat === null || $rawLat === '' || $rawLng === null || $rawLng === '') {
+                    throw new Exception('Latitude e longitude são obrigatórias para o envio de localização.');
+                }
+
+                if (! is_numeric($rawLat) || ! is_numeric($rawLng)) {
+                    throw new Exception('Latitude e longitude devem ser valores numéricos válidos.');
+                }
+
+                $lat = (float) $rawLat;
+                $lng = (float) $rawLng;
+
+                if (! is_finite($lat) || ! is_finite($lng) || $lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
+                    throw new Exception('Latitude deve estar entre -90 e 90 e longitude entre -180 e 180.');
+                }
+
                 $pending->location($lat, $lng)->send();
             } elseif ($this->contactConfig !== null) {
                 $name = (string) $this->resolveValue($this->contactConfig['name'], $record);
@@ -471,7 +496,7 @@ class SendGowaAction extends Action
 
     protected function resolveValue(mixed $value, ?Model $record): mixed
     {
-        if (is_callable($value)) {
+        if ($value instanceof Closure) {
             return call_user_func($value, $record);
         }
 

@@ -130,7 +130,7 @@
                             @endif
 
                             <span>
-                                {{ Str::limit($latestMessage->body ?: \Gowa\Filament\Pages\GowaConversationsPage::messageTypeLabel($latestMessage->type), 35) }}
+                                {{ \Illuminate\Support\Str::limit($latestMessage->body ?: \Gowa\Filament\Pages\GowaConversationsPage::messageTypeLabel($latestMessage->type), 35) }}
                             </span>
                         @else
                             <span style="font-style: italic; opacity: 0.7;">{{ __('gowa-filament::gowa-filament.conversations.no_messages') }}</span>

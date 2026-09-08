@@ -111,20 +111,39 @@
         class="gowa-chat-messages"
         wire:poll.4s
         x-data="{
+            observer: null,
+            isNearBottom: true,
+            checkNearBottom() {
+                const el = this.$refs.chatContainer;
+                if (el) {
+                    this.isNearBottom = (el.scrollHeight - el.scrollTop - el.clientHeight) < 120;
+                }
+            },
             scrollToBottom() {
                 this.$nextTick(() => {
                     if (this.$refs.chatContainer) {
                         this.$refs.chatContainer.scrollTop = this.$refs.chatContainer.scrollHeight;
+                        this.isNearBottom = true;
                     }
                 });
             },
             init() {
                 this.scrollToBottom();
-                const observer = new MutationObserver(() => this.scrollToBottom());
-                observer.observe(this.$refs.chatContainer, { childList: true, subtree: true });
+                this.observer = new MutationObserver(() => {
+                    if (this.isNearBottom) {
+                        this.scrollToBottom();
+                    }
+                });
+                this.observer.observe(this.$refs.chatContainer, { childList: true, subtree: true });
+            },
+            destroy() {
+                if (this.observer) {
+                    this.observer.disconnect();
+                }
             }
         }"
         x-ref="chatContainer"
+        @scroll.passive="checkNearBottom()"
     >
         @php
             $lastDate = null;

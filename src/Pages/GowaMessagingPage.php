@@ -94,7 +94,32 @@ class GowaMessagingPage extends Page
 
     public static function canAccess(): bool
     {
-        return parent::canAccess();
+        if (! parent::canAccess()) {
+            return false;
+        }
+
+        try {
+            $plugin = filament()->getPlugin('gowa-filament');
+        } catch (\Throwable) {
+            // Plugin not registered or outside panel context
+            return true;
+        }
+
+        if ($plugin instanceof \Gowa\Filament\GowaPlugin) {
+            try {
+                $callback = $plugin->getMessagingAuthorizationCallback();
+
+                if ($callback) {
+                    return (bool) app()->call($callback);
+                }
+            } catch (\Throwable $e) {
+                report($e);
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function mount(): void

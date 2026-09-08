@@ -262,6 +262,13 @@ it('renders media preview and download link', function () {
 });
 
 it('automatically marks inbound messages as read when opening conversation', function () {
+    $client = Mockery::mock(\Gowa\Sdk\GowaClient::class);
+    $client->shouldReceive('markRead')
+        ->with('test-device-inbox', '5511999999999@s.whatsapp.net', 'MSG_AUTO_READ_01')
+        ->once();
+
+    \Gowa\Laravel\Facades\Gowa::swap($client);
+
     $message = GowaMessage::create([
         'instance_id'     => $this->instance->id,
         'conversation_id' => $this->conversation->id,
@@ -283,6 +290,59 @@ it('automatically marks inbound messages as read when opening conversation', fun
         ->and($message->fresh()->status)->toBe(\Gowa\Laravel\Enums\GowaMessageStatus::Read);
 });
 
+it('does not mark message as read locally if GOWA markRead fails', function () {
+    $client = Mockery::mock(\Gowa\Sdk\GowaClient::class);
+    $client->shouldReceive('markRead')
+        ->with('test-device-inbox', '5511999999999@s.whatsapp.net', 'MSG_FAIL_01')
+        ->once()
+        ->andThrow(new \RuntimeException('GOWA connection timeout'));
+
+    \Gowa\Laravel\Facades\Gowa::swap($client);
+
+    $message = GowaMessage::create([
+        'instance_id'     => $this->instance->id,
+        'conversation_id' => $this->conversation->id,
+        'message_id'      => 'MSG_FAIL_01',
+        'direction'       => 'inbound',
+        'status'          => 'delivered',
+        'type'            => 'text',
+        'body'            => 'Failed receipt message',
+        'sent_at'         => now(),
+        'read_at'         => null,
+    ]);
+
+    livewire(GowaConversationsPage::class)
+        ->call('markConversationRead', $this->conversation->id);
+
+    expect($message->fresh()->read_at)->toBeNull()
+        ->and($message->fresh()->status)->toBe(\Gowa\Laravel\Enums\GowaMessageStatus::Delivered);
+});
+
+it('does not mark message as read and does not call markRead when message_id is empty', function () {
+    $client = Mockery::mock(\Gowa\Sdk\GowaClient::class);
+    $client->shouldNotReceive('markRead');
+
+    \Gowa\Laravel\Facades\Gowa::swap($client);
+
+    $message = GowaMessage::create([
+        'instance_id'     => $this->instance->id,
+        'conversation_id' => $this->conversation->id,
+        'message_id'      => '',
+        'direction'       => 'inbound',
+        'status'          => 'delivered',
+        'type'            => 'text',
+        'body'            => 'Message without external ID',
+        'sent_at'         => now(),
+        'read_at'         => null,
+    ]);
+
+    livewire(GowaConversationsPage::class)
+        ->call('markConversationRead', $this->conversation->id);
+
+    expect($message->fresh()->read_at)->toBeNull()
+        ->and($message->fresh()->status)->toBe(\Gowa\Laravel\Enums\GowaMessageStatus::Delivered);
+});
+
 it('resolves latest message by sent_at as primary ordering', function () {
     // Newer message inserted first
     GowaMessage::create([
@@ -296,7 +356,7 @@ it('resolves latest message by sent_at as primary ordering', function () {
         'sent_at'         => now()->subMinute(),
     ]);
 
-    // Older message inserted afterwards (higher id, older sent_at)
+    // Older message inserted second
     GowaMessage::create([
         'instance_id'     => $this->instance->id,
         'conversation_id' => $this->conversation->id,
@@ -305,11 +365,34 @@ it('resolves latest message by sent_at as primary ordering', function () {
         'status'          => 'delivered',
         'type'            => 'text',
         'body'            => 'Older message',
-        'sent_at'         => now()->subHour(),
+        'sent_at'         => now()->subMinutes(10),
     ]);
 
     $conversation = GowaConversation::with('latestMessage')->find($this->conversation->id);
 
     expect($conversation->latestMessage)->not->toBeNull()
         ->and($conversation->latestMessage->message_id)->toBe('MSG_NEWER');
+});
+
+it('caches negative result when avatar is absent to avoid repeated external calls', function () {
+    cache()->forget("gowa_avatar_{$this->instance->device_id}");
+
+    $this->instance->phone_number = '5511999999999';
+    $this->instance->save();
+
+    $client = Mockery::mock(\Gowa\Sdk\GowaClient::class);
+    $client->shouldReceive('avatar')
+        ->with('test-device-inbox', '5511999999999')
+        ->once()
+        ->andReturnNull();
+
+    \Gowa\Laravel\Facades\Gowa::swap($client);
+
+    // First call triggers external call and caches sentinel
+    $url1 = GowaConversationsPage::instanceAvatarUrl($this->instance);
+    expect($url1)->toContain('ui-avatars.com');
+
+    // Second call reads sentinel from cache without triggering Mockery twice
+    $url2 = GowaConversationsPage::instanceAvatarUrl($this->instance);
+    expect($url2)->toBe($url1);
 });
