@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Resources\GowaInstanceResource\Pages;
 
 use Filament\Actions\CreateAction;
@@ -37,7 +39,7 @@ class ListGowaInstances extends ListRecords
                             deviceId: (string) $record->device_id,
                             webhookUrl: $webhookUrl,
                             webhookSecret: '',
-                            events: ['message', 'message.ack', 'message.reaction', 'device.status']
+                            events: ['message', 'message.ack', 'message.reaction', 'device.status'],
                         );
                     } catch (\Throwable $e) {
                         // Silently handle if device is registered during pairing

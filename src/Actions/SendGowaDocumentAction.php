@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Actions;
 
 use Closure;
@@ -12,8 +14,6 @@ use Filament\Notifications\Notification;
 use Filament\Support\Enums\Width;
 use Gowa\Laravel\Facades\Gowa;
 use Gowa\Laravel\Models\GowaInstance;
-use Gowa\Sdk\Dto\MediaPayload;
-use Gowa\Sdk\Dto\MediaType;
 use Gowa\Sdk\Dto\MediaUpload;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -41,10 +41,35 @@ class SendGowaDocumentAction extends Action
             ->color('info')
             ->modalHeading(__('gowa-filament::gowa-filament.actions.send_document'))
             ->modalWidth(Width::Medium)
-            ->form(fn (self $action, ?Model $record): array => $action->getFormSchema($record))
+            ->form(fn(self $action, ?Model $record): array => $action->getFormSchema($record))
             ->action(function (array $data, self $action, ?Model $record): void {
                 $action->executeSendDocument($data, $record);
             });
+    }
+
+    public function to(string|Closure $to): static
+    {
+        return $this->number($to);
+    }
+
+    public function from(string|int|Closure $from): static
+    {
+        return $this->instance($from);
+    }
+
+    public function document(mixed $file, string|Closure|null $filename = null): static
+    {
+        if (is_string($file) && filter_var($file, FILTER_VALIDATE_URL)) {
+            $this->documentUrl($file);
+        } else {
+            $this->documentFile($file);
+        }
+
+        if ($filename !== null) {
+            $this->filename($filename);
+        }
+
+        return $this;
     }
 
     public function numberFrom(string|Closure $columnOrClosure): static
@@ -316,14 +341,10 @@ class SendGowaDocumentAction extends Action
             $recipient = (string) ($data['to'] ?? $this->resolveNumber($record));
             $upload = $this->resolveMediaUpload($data, $record);
 
-            Gowa::sendMedia(
-                $deviceId,
-                $recipient,
-                new MediaPayload(
-                    type: MediaType::Document,
-                    upload: $upload,
-                )
-            );
+            Gowa::to($recipient)
+                ->from($deviceId)
+                ->document($upload)
+                ->send();
 
             Notification::make()
                 ->title(__('gowa-filament::gowa-filament.notifications.message_sent'))

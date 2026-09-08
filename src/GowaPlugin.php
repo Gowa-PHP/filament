@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Gowa\Filament\Pages\GowaConversationsPage;
 use Gowa\Filament\Pages\GowaMessagingPage;
 use Gowa\Filament\Resources\GowaInstanceResource;
 use Gowa\Filament\Widgets\GowaDeviceStatusWidget;
@@ -13,6 +16,7 @@ class GowaPlugin implements Plugin
     protected bool $hasInstanceResource = true;
     protected bool $hasDeviceStatusWidget = true;
     protected bool $hasMessagingPage = true;
+    protected bool $hasConversationsPage = true;
 
     public function getId(): string
     {
@@ -68,6 +72,18 @@ class GowaPlugin implements Plugin
         return $this->hasMessagingPage;
     }
 
+    public function conversationsPage(bool $condition = true): static
+    {
+        $this->hasConversationsPage = $condition;
+
+        return $this;
+    }
+
+    public function hasConversationsPage(): bool
+    {
+        return $this->hasConversationsPage;
+    }
+
     public function register(Panel $panel): void
     {
         if ($this->hasInstanceResource) {
@@ -79,6 +95,12 @@ class GowaPlugin implements Plugin
         if ($this->hasMessagingPage) {
             $panel->pages([
                 GowaMessagingPage::class,
+            ]);
+        }
+
+        if ($this->hasConversationsPage) {
+            $panel->pages([
+                GowaConversationsPage::class,
             ]);
         }
 

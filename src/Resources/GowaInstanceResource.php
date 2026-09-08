@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Resources;
 
 use Filament\Actions\ActionGroup;
@@ -104,7 +106,7 @@ class GowaInstanceResource extends Resource
                             ->label(__('gowa-filament::gowa-filament.fields.webhook_url'))
                             ->helperText(__('gowa-filament::gowa-filament.fields.webhook_url_helper'))
                             ->prefixIcon('heroicon-o-link')
-                            ->formatStateUsing(fn ($record): ?string => $record ? url(config('gowa.webhook.path', 'webhooks/gowa') . '/' . $record->device_id) : null)
+                            ->formatStateUsing(fn($record): ?string => $record ? url(config('gowa.webhook.path', 'webhooks/gowa') . '/' . $record->device_id) : null)
                             ->readOnly()
                             ->dehydrated(false)
                             ->hiddenOn(Operation::Create)
@@ -124,7 +126,7 @@ class GowaInstanceResource extends Resource
                                     ->tooltip(__('gowa-filament::gowa-filament.fields.generate_secret_tooltip'))
                                     ->action(function ($set): void {
                                         $set('webhook_secret', \Illuminate\Support\Str::random(32));
-                                    })
+                                    }),
                             ),
 
                         Toggle::make('meta.webhook_insecure_skip_verify')
@@ -148,7 +150,7 @@ class GowaInstanceResource extends Resource
                                     ->circular()
                                     ->height(80)
                                     ->width(80)
-                                    ->defaultImageUrl(fn ($record): string => 'https://ui-avatars.com/api/?name=' . urlencode($record->name ?? 'WA') . '&color=128C7E&background=DCF8C6')
+                                    ->defaultImageUrl(fn($record): string => 'https://ui-avatars.com/api/?name=' . urlencode($record->name ?? 'WA') . '&color=128C7E&background=DCF8C6')
                                     ->getStateUsing(function ($record): ?string {
                                         if (empty($record->phone_number) || empty($record->device_id)) {
                                             return null;
@@ -200,20 +202,20 @@ class GowaInstanceResource extends Resource
                         TextEntry::make('status')
                             ->label(__('gowa-filament::gowa-filament.fields.connection_status'))
                             ->badge()
-                            ->color(fn (mixed $state): string => match ($state instanceof GowaInstanceStatus ? $state->value : (string) $state) {
-                                'open', 'connected' => 'success',
-                                'connecting' => 'warning',
+                            ->color(fn(mixed $state): string => match ($state instanceof GowaInstanceStatus ? $state->value : (string) $state) {
+                                'open', 'connected'     => 'success',
+                                'connecting'            => 'warning',
                                 'close', 'disconnected' => 'danger',
-                                default => 'gray',
+                                default                 => 'gray',
                             })
                             ->formatStateUsing(function (mixed $state): string {
                                 $value = $state instanceof GowaInstanceStatus ? $state->value : (string) $state;
 
                                 return match ($value) {
-                                    'open', 'connected' => __('gowa-filament::gowa-filament.status.connected'),
-                                    'connecting' => __('gowa-filament::gowa-filament.status.connecting'),
+                                    'open', 'connected'     => __('gowa-filament::gowa-filament.status.connected'),
+                                    'connecting'            => __('gowa-filament::gowa-filament.status.connecting'),
                                     'close', 'disconnected' => __('gowa-filament::gowa-filament.status.disconnected'),
-                                    default => ucfirst($value),
+                                    default                 => ucfirst($value),
                                 };
                             }),
 
@@ -233,7 +235,7 @@ class GowaInstanceResource extends Resource
                             ->fontFamily('mono')
                             ->copyable()
                             ->icon('heroicon-o-link')
-                            ->getStateUsing(fn ($record): string => url(config('gowa.webhook.path', 'webhooks/gowa') . '/' . $record->device_id)),
+                            ->getStateUsing(fn($record): string => url(config('gowa.webhook.path', 'webhooks/gowa') . '/' . $record->device_id)),
 
                         Grid::make(2)
                             ->schema([
@@ -269,7 +271,7 @@ class GowaInstanceResource extends Resource
                 ImageColumn::make('avatar_url')
                     ->label('')
                     ->circular()
-                    ->defaultImageUrl(fn ($record): string => 'https://ui-avatars.com/api/?name=' . urlencode($record->name ?? 'WA') . '&color=128C7E&background=DCF8C6')
+                    ->defaultImageUrl(fn($record): string => 'https://ui-avatars.com/api/?name=' . urlencode($record->name ?? 'WA') . '&color=128C7E&background=DCF8C6')
                     ->getStateUsing(function ($record): ?string {
                         if (empty($record->phone_number) || empty($record->device_id)) {
                             return null;
@@ -312,20 +314,20 @@ class GowaInstanceResource extends Resource
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (mixed $state): string => match ($state instanceof GowaInstanceStatus ? $state->value : (string) $state) {
-                        'open', 'connected' => 'success',
-                        'connecting' => 'warning',
+                    ->color(fn(mixed $state): string => match ($state instanceof GowaInstanceStatus ? $state->value : (string) $state) {
+                        'open', 'connected'     => 'success',
+                        'connecting'            => 'warning',
                         'close', 'disconnected' => 'danger',
-                        default => 'gray',
+                        default                 => 'gray',
                     })
                     ->formatStateUsing(function (mixed $state): string {
                         $value = $state instanceof GowaInstanceStatus ? $state->value : (string) $state;
 
                         return match ($value) {
-                            'open', 'connected' => __('gowa-filament::gowa-filament.status.connected'),
-                            'connecting' => __('gowa-filament::gowa-filament.status.connecting'),
+                            'open', 'connected'     => __('gowa-filament::gowa-filament.status.connected'),
+                            'connecting'            => __('gowa-filament::gowa-filament.status.connecting'),
                             'close', 'disconnected' => __('gowa-filament::gowa-filament.status.disconnected'),
-                            default => ucfirst($value),
+                            default                 => ucfirst($value),
                         };
                     }),
 
@@ -342,7 +344,7 @@ class GowaInstanceResource extends Resource
             ])
             ->actions([
                 ConnectQrAction::make()
-                    ->visible(fn ($record): bool => ! ($record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true))),
+                    ->visible(fn($record): bool => ! ($record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true))),
 
                 ActionGroup::make([
                     SendGowaMessageAction::make('sendTestMessage')
@@ -350,21 +352,21 @@ class GowaInstanceResource extends Resource
                         ->icon('heroicon-o-paper-airplane')
                         ->color('primary')
                         ->instanceFromRecord()
-                        ->visible(fn ($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
+                        ->visible(fn($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
 
                     SendGowaNotificationAction::make('sendTestNotification')
                         ->label(__('gowa-filament::gowa-filament.actions.send_notification'))
                         ->icon('heroicon-o-bell')
                         ->color('warning')
                         ->instanceFromRecord()
-                        ->visible(fn ($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
+                        ->visible(fn($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
 
                     ConnectPairingCodeAction::make()
-                        ->hidden(fn ($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
+                        ->hidden(fn($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
                     UpdateWebhookAction::make(),
                     RefreshStatusAction::make(),
                     DisconnectAction::make()
-                        ->visible(fn ($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
+                        ->visible(fn($record): bool => $record->status instanceof GowaInstanceStatus ? $record->status->isConnected() : in_array((string) $record->status, ['open', 'connected'], true)),
                     ViewAction::make()
                         ->slideOver()
                         ->modalHeading(__('gowa-filament::gowa-filament.actions.view_heading'))
@@ -386,7 +388,7 @@ class GowaInstanceResource extends Resource
                                     webhookUrl: $webhookUrl,
                                     webhookSecret: $record->webhook_secret ?? '',
                                     events: ['message', 'message.ack', 'message.reaction', 'device.status'],
-                                    insecureSkipVerify: $insecureSkipVerify
+                                    insecureSkipVerify: $insecureSkipVerify,
                                 );
                             } catch (\Throwable $e) {
                                 // Silently handle sync failure

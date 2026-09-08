@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Resources\GowaInstanceResource\Actions;
 
 use Exception;
@@ -26,18 +28,18 @@ class RefreshStatusAction
 
                         $statusEnum = match (true) {
                             $device->isPaired() || in_array($statusStr, ['logged_in', 'open', 'connected', 'authenticated', 'paired'], true) => GowaInstanceStatus::Open,
-                            in_array($statusStr, ['connecting', 'qr_pairing', 'code_pairing', 'login'], true) => GowaInstanceStatus::Connecting,
-                            in_array($statusStr, ['close', 'closed', 'disconnected', 'logged_out', 'logout'], true) => GowaInstanceStatus::Close,
-                            in_array($statusStr, ['created'], true) => GowaInstanceStatus::Created,
-                            default => GowaInstanceStatus::tryFrom($statusStr) ?? $record->status,
+                            in_array($statusStr, ['connecting', 'qr_pairing', 'code_pairing', 'login'], true)                                => GowaInstanceStatus::Connecting,
+                            in_array($statusStr, ['close', 'closed', 'disconnected', 'logged_out', 'logout'], true)                          => GowaInstanceStatus::Close,
+                            in_array($statusStr, ['created'], true)                                                                          => GowaInstanceStatus::Created,
+                            default                                                                                                          => GowaInstanceStatus::tryFrom($statusStr) ?? $record->status,
                         };
 
                         $name = ! empty($device->name) ? $device->name : ($device->raw['display_name'] ?? $record->name);
                         $phone = $device->phone ?? $device->phoneNumber ?? (is_string($device->jid ?? null) ? explode('@', $device->jid)[0] : $record->phone_number);
 
                         $dataToUpdate = [
-                            'status' => $statusEnum,
-                            'name' => $name,
+                            'status'       => $statusEnum,
+                            'name'         => $name,
                             'phone_number' => $phone,
                         ];
 

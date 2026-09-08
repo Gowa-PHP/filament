@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Resources\GowaInstanceResource\Pages;
 
 use Filament\Actions\DeleteAction;

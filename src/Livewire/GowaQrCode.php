@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Livewire;
 
 use Exception;
@@ -34,9 +36,9 @@ class GowaQrCode extends Component
     {
         $bagInstance = match (true) {
             $bag instanceof MessageBagContract => $bag,
-            $bag instanceof Arrayable => new MessageBag($bag->toArray()),
-            is_array($bag) => new MessageBag($bag),
-            default => new MessageBag(),
+            $bag instanceof Arrayable          => new MessageBag($bag->toArray()),
+            is_array($bag)                     => new MessageBag($bag),
+            default                            => new MessageBag(),
         };
 
         \Livewire\store($this)->set('errorBag', $bagInstance);

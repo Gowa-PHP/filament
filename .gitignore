@@ -3,3 +3,6 @@
 .env
 composer.lock
 .php-cs-fixer.cache
+.ai-memory.toml
+.serena/
+

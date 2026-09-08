@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Resources\GowaInstanceResource\Actions;
 
 use Exception;
@@ -26,7 +28,7 @@ class UpdateWebhookAction
                         webhookUrl: $webhookUrl,
                         webhookSecret: $record->webhook_secret ?? '',
                         events: ['message', 'message.ack', 'message.reaction', 'device.status'],
-                        insecureSkipVerify: $insecureSkipVerify
+                        insecureSkipVerify: $insecureSkipVerify,
                     );
 
                     Notification::make()

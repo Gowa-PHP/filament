@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Widgets;
 
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -22,28 +24,28 @@ class GowaDeviceStatusWidget extends BaseWidget
         return [
             Stat::make(
                 __('gowa-filament::gowa-filament.widgets.total_instances'),
-                (string) $total
+                (string) $total,
             )
                 ->icon('heroicon-o-rectangle-stack')
                 ->color('gray'),
 
             Stat::make(
                 __('gowa-filament::gowa-filament.widgets.connected_instances'),
-                (string) $connected
+                (string) $connected,
             )
                 ->icon('heroicon-o-check-circle')
                 ->color('success'),
 
             Stat::make(
                 __('gowa-filament::gowa-filament.widgets.connecting_instances'),
-                (string) $connecting
+                (string) $connecting,
             )
                 ->icon('heroicon-o-arrow-path')
                 ->color('warning'),
 
             Stat::make(
                 __('gowa-filament::gowa-filament.widgets.disconnected_instances'),
-                (string) $disconnected
+                (string) $disconnected,
             )
                 ->icon('heroicon-o-x-circle')
                 ->color('danger'),

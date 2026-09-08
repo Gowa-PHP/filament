@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Gowa\Filament\Actions\SendGowaDocumentAction;
 use Gowa\Filament\Actions\SendGowaMediaAction;
 use Gowa\Filament\Actions\SendGowaMessageAction;
@@ -21,16 +23,16 @@ it('instantiates SendGowaMessageAction with default settings', function () {
 it('executes send text message via action', function () {
     $client = Mockery::mock(GowaClient::class);
     $client->shouldReceive('sendText')
-        ->with('device_test_01', '5511999999999', 'Hello WhatsApp Test!')
+        ->withArgs(fn($deviceId, $to, $text) => $deviceId === 'device_test_01' && $to === '5511999999999' && $text === 'Hello WhatsApp Test!')
         ->once()
         ->andReturn(new SentMessage(providerMessageId: 'msg_01', raw: []));
 
     Gowa::swap($client);
 
-    $dummyRecord = new class extends Model {
+    $dummyRecord = new class () extends Model {
         protected $attributes = [
-            'id' => 1,
-            'device_id' => 'device_test_01',
+            'id'           => 1,
+            'device_id'    => 'device_test_01',
             'phone_number' => '5511999999999',
         ];
     };
@@ -62,10 +64,10 @@ it('executes send document action via URL', function () {
 
     Gowa::swap($client);
 
-    $dummyRecord = new class extends Model {
+    $dummyRecord = new class () extends Model {
         protected $attributes = [
-            'id' => 1,
-            'device_id' => 'device_test_01',
+            'id'           => 1,
+            'device_id'    => 'device_test_01',
             'phone_number' => '5511999999999',
         ];
     };
@@ -77,9 +79,9 @@ it('executes send document action via URL', function () {
         ->filename('fatura.pdf');
 
     $action->executeSendDocument([
-        'to' => '5511999999999',
+        'to'           => '5511999999999',
         'document_url' => 'https://example.com/invoice.pdf',
-        'filename' => 'fatura.pdf',
+        'filename'     => 'fatura.pdf',
     ], $dummyRecord);
 });
 
@@ -94,10 +96,10 @@ it('executes send media action via URL', function () {
 
     Gowa::swap($client);
 
-    $dummyRecord = new class extends Model {
+    $dummyRecord = new class () extends Model {
         protected $attributes = [
-            'id' => 1,
-            'device_id' => 'device_test_01',
+            'id'           => 1,
+            'device_id'    => 'device_test_01',
             'phone_number' => '5511999999999',
         ];
     };
@@ -110,9 +112,9 @@ it('executes send media action via URL', function () {
         ->caption('Receipt Photo');
 
     $action->executeSendMedia([
-        'to' => '5511999999999',
+        'to'        => '5511999999999',
         'media_url' => 'https://example.com/photo.jpg',
-        'caption' => 'Receipt Photo',
+        'caption'   => 'Receipt Photo',
     ], $dummyRecord);
 });
 
@@ -125,10 +127,10 @@ it('instantiates and executes SendGowaNotificationAction', function () {
 
     Gowa::swap($client);
 
-    $dummyRecord = new class extends Model {
+    $dummyRecord = new class () extends Model {
         protected $attributes = [
-            'id' => 1,
-            'device_id' => 'device_test_01',
+            'id'           => 1,
+            'device_id'    => 'device_test_01',
             'phone_number' => '5511999999999',
         ];
     };

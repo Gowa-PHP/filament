@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament\Tests;
 
 use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
@@ -15,7 +17,6 @@ use Filament\Widgets\WidgetsServiceProvider;
 use Gowa\Filament\GowaFilamentServiceProvider;
 use Gowa\Filament\GowaPlugin;
 use Gowa\Laravel\GowaServiceProvider;
-use Illuminate\Database\Schema\Blueprint;
 use Livewire\Features\SupportTesting\SupportTesting;
 use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
@@ -38,8 +39,6 @@ abstract class TestCase extends Orchestra
 
         Filament::setCurrentPanel($panel);
         Filament::registerPanel($panel);
-
-        $this->setUpDatabase($this->app);
     }
 
     protected function getPackageProviders($app): array
@@ -66,9 +65,9 @@ abstract class TestCase extends Orchestra
 
         config()->set('database.default', 'testing');
         config()->set('database.connections.testing', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
 
         config()->set('gowa.base_url', 'https://gowa-api.test');
@@ -77,17 +76,8 @@ abstract class TestCase extends Orchestra
         config()->set('gowa.webhook.secret', 'test-secret');
     }
 
-    protected function setUpDatabase($app): void
+    protected function defineDatabaseMigrations(): void
     {
-        $app['db']->connection()->getSchemaBuilder()->create('gowa_instances', function (Blueprint $table) {
-            $table->id();
-            $table->string('device_id')->unique();
-            $table->string('name')->nullable();
-            $table->string('phone_number')->nullable();
-            $table->string('status')->default('close');
-            $table->json('meta')->nullable();
-            $table->timestamp('connected_at')->nullable();
-            $table->timestamps();
-        });
+        $this->loadMigrationsFrom(__DIR__ . '/../vendor/gowa-php/laravel/database/migrations');
     }
 }

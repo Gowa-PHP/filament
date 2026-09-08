@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gowa\Filament;
 
 use Gowa\Filament\Livewire\GowaPairingCode;
 use Gowa\Filament\Livewire\GowaQrCode;
+use Gowa\Laravel\Models\GowaConversation;
+use Gowa\Laravel\Models\GowaMessage;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -13,7 +17,7 @@ class GowaFilamentServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(
             __DIR__ . '/../config/gowa-filament.php',
-            'gowa-filament'
+            'gowa-filament',
         );
     }
 
@@ -21,6 +25,13 @@ class GowaFilamentServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'gowa-filament');
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'gowa-filament');
+
+        if (class_exists(GowaConversation::class)) {
+            GowaConversation::resolveRelationUsing('latestMessage', function ($conversation) {
+                return $conversation->hasOne(config('gowa.models.message', GowaMessage::class), 'conversation_id')
+                    ->latestOfMany(['sent_at', 'id']);
+            });
+        }
 
         if (class_exists(Livewire::class)) {
             Livewire::component('gowa-qr-code', GowaQrCode::class);
