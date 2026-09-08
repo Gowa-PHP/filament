@@ -10,8 +10,6 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
@@ -34,10 +32,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\MessageBag;
 
-class GowaConversationsPage extends Page implements HasForms
+class GowaConversationsPage extends Page
 {
-    use InteractsWithForms;
-
     protected string $view = 'gowa-filament::pages.gowa-conversations-page';
 
     public function getErrorBag(): MessageBagContract
@@ -109,6 +105,11 @@ class GowaConversationsPage extends Page implements HasForms
     public function getSubheading(): ?string
     {
         return __('gowa-filament::gowa-filament.conversations.subheading');
+    }
+
+    public static function canAccess(): bool
+    {
+        return parent::canAccess();
     }
 
     public function mount(): void
@@ -226,9 +227,7 @@ class GowaConversationsPage extends Page implements HasForms
     public function getConversationsProperty(): Collection
     {
         $query = GowaConversation::query()
-            ->with(['instance', 'messages' => function ($q) {
-                $q->latest('sent_at')->latest('created_at')->limit(1);
-            }])
+            ->with(['instance', 'latestMessage'])
             ->withCount(['messages as unread_count' => function ($q) {
                 $q->where('direction', GowaMessageDirection::Inbound->value)
                     ->whereNull('read_at');
@@ -353,23 +352,31 @@ class GowaConversationsPage extends Page implements HasForms
                 $text,
             );
 
-            // Record message locally for instantaneous feedback
-            $providerId = $sentMessage instanceof SentMessage ? $sentMessage->providerMessageId : 'out_' . uniqid();
-            $messageModel = config('gowa.models.message', GowaMessage::class);
-            $messageModel::create([
-                'instance_id'     => $instance->id,
-                'conversation_id' => $conversation->id,
-                'message_id'      => $providerId,
-                'direction'       => GowaMessageDirection::Outbound,
-                'status'          => GowaMessageStatus::Sent,
-                'type'            => 'text',
-                'body'            => $text,
-                'sent_at'         => now(),
-            ]);
-
-            $conversation->update(['last_message_at' => now()]);
-
+            // Once sent successfully to WhatsApp API, clear input immediately
+            // to avoid accidental duplicate sends if subsequent local operations fail.
             $this->newMessage = '';
+
+            // Record message locally for instantaneous feedback
+            try {
+                $providerId = $sentMessage instanceof SentMessage ? $sentMessage->providerMessageId : 'out_' . uniqid();
+                $messageModel = config('gowa.models.message', GowaMessage::class);
+                $messageModel::create([
+                    'instance_id'     => $instance->id,
+                    'conversation_id' => $conversation->id,
+                    'message_id'      => $providerId,
+                    'direction'       => GowaMessageDirection::Outbound,
+                    'status'          => GowaMessageStatus::Sent,
+                    'type'            => 'text',
+                    'body'            => $text,
+                    'sent_at'         => now(),
+                ]);
+
+                $conversation->update(['last_message_at' => now()]);
+            } catch (\Throwable $localDbException) {
+                Log::warning('GOWA local message persistence warning: ' . $localDbException->getMessage(), [
+                    'exception' => $localDbException,
+                ]);
+            }
 
             Notification::make()
                 ->title(__('gowa-filament::gowa-filament.notifications.message_sent'))
@@ -454,9 +461,13 @@ class GowaConversationsPage extends Page implements HasForms
 
             $diskName = config('filament.default_filesystem_disk', 'public');
             $disk = Storage::disk($diskName);
-            $fullPath = $disk->path($filePath);
             $mime = $disk->mimeType($filePath) ?: 'application/octet-stream';
             $mediaUrl = $disk->url($filePath);
+            $stream = $disk->readStream($filePath);
+
+            if (! is_resource($stream)) {
+                throw new Exception("Could not read attachment file from storage disk [{$diskName}].");
+            }
 
             $mediaType = match ($type) {
                 'video'    => MediaType::Video,
@@ -465,10 +476,10 @@ class GowaConversationsPage extends Page implements HasForms
                 default    => MediaType::Image,
             };
 
-            $upload = new MediaUpload(
-                source: $fullPath,
-                filename: basename($filePath),
+            $upload = MediaUpload::fromStream(
+                stream: $stream,
                 mimeType: $mime,
+                filename: basename($filePath),
             );
 
             $payload = new MediaPayload(
@@ -487,21 +498,27 @@ class GowaConversationsPage extends Page implements HasForms
             $providerId = $sent instanceof SentMessage ? $sent->providerMessageId : 'media_' . uniqid();
 
             // Record message locally
-            $messageModel = config('gowa.models.message', GowaMessage::class);
-            $messageModel::create([
-                'instance_id'     => $instance->id,
-                'conversation_id' => $conversation->id,
-                'message_id'      => $providerId,
-                'direction'       => GowaMessageDirection::Outbound,
-                'status'          => GowaMessageStatus::Sent,
-                'type'            => $type,
-                'body'            => $caption ?? basename($filePath),
-                'media_url'       => $mediaUrl,
-                'media_mime'      => $mime,
-                'sent_at'         => now(),
-            ]);
+            try {
+                $messageModel = config('gowa.models.message', GowaMessage::class);
+                $messageModel::create([
+                    'instance_id'     => $instance->id,
+                    'conversation_id' => $conversation->id,
+                    'message_id'      => $providerId,
+                    'direction'       => GowaMessageDirection::Outbound,
+                    'status'          => GowaMessageStatus::Sent,
+                    'type'            => $type,
+                    'body'            => $caption ?? basename($filePath),
+                    'media_url'       => $mediaUrl,
+                    'media_mime'      => $mime,
+                    'sent_at'         => now(),
+                ]);
 
-            $conversation->update(['last_message_at' => now()]);
+                $conversation->update(['last_message_at' => now()]);
+            } catch (\Throwable $localDbException) {
+                Log::warning('GOWA local attachment persistence warning: ' . $localDbException->getMessage(), [
+                    'exception' => $localDbException,
+                ]);
+            }
 
             Notification::make()
                 ->title(__('gowa-filament::gowa-filament.notifications.message_sent'))
@@ -554,9 +571,9 @@ class GowaConversationsPage extends Page implements HasForms
                     ]);
             }
 
-            // 2. Call GOWA API for external WhatsApp read receipts
+            // 2. Call GOWA API for external WhatsApp read receipts (capped to prevent request timeouts)
             if ($conversation->instance) {
-                foreach ($unreadMessages as $message) {
+                foreach ($unreadMessages->take(20) as $message) {
                     try {
                         Gowa::markRead(
                             $conversation->instance->device_id,

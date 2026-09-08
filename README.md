@@ -3,40 +3,40 @@
 
   # gowa-php/filament
 
-  **Filament v5 / v4 / v3 plugin for integrating GOWA WhatsApp instances into Laravel Filament applications**
+  **Filament v5 / v4 plugin for integrating GOWA WhatsApp instances into Laravel Filament applications**
 
   [![Latest Version](https://img.shields.io/packagist/v/gowa-php/filament.svg?style=flat-square)](https://packagist.org/packages/gowa-php/filament)
   [![Total Downloads](https://img.shields.io/packagist/dt/gowa-php/filament.svg?style=flat-square)](https://packagist.org/packages/gowa-php/filament)
   [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
   [![PHP Version](https://img.shields.io/badge/PHP-%3E%3D%208.2-777BB4.svg?style=flat-square)](https://php.net)
   [![Laravel](https://img.shields.io/badge/Laravel-10%20|%2011%20|%2012-FF2D20.svg?style=flat-square)](https://laravel.com)
-  [![Filament](https://img.shields.io/badge/Filament-v3%20|%20v4%20|%20v5-FDAE4B.svg?style=flat-square)](https://filamentphp.com)
+  [![Filament](https://img.shields.io/badge/Filament-v4%20|%20v5-FDAE4B.svg?style=flat-square)](https://filamentphp.com)
 
 </div>
 
 ---
 
-> 🇧🇷 Para ler a documentação em Português, acesse [README.pt.md](README.pt.md).
+> 🇧🇷 Para documentação em Português, leia [README.pt.md](README.pt.md).
 
 ---
 
-## ⚡ Acknowledgments & Ecosystem Dependencies
+## ⚡ Acknowledgements & Ecosystem Dependencies
 
-This package is Phase 3 of the GOWA PHP ecosystem and interacts with the open-source Go backend ecosystem:
+This package is Phase 3 of the GOWA PHP ecosystem and builds upon the open-source Go ecosystem:
 
-- **[whatsmeow](https://go.mau.fi/whatsmeow)** — The underlying Go library created by [Tulir Asokan](https://github.com/tulir) that reverse-engineers the WhatsApp Web Multi-Device WebSocket protocol and Signal encryption.
-- **[go-whatsapp-web-multidevice (GOWA)](https://github.com/aldinokemal/go-whatsapp-web-multidevice)** — The lightweight REST API wrapper created by [Aldino Kemal](https://github.com/aldinokemal) exposing `whatsmeow` over HTTP and Webhooks.
-- **[gowa-php/sdk](https://packagist.org/packages/gowa-php/sdk)** — Pure PHP SDK for GOWA REST API and Webhook parsing.
-- **[gowa-php/laravel](https://packagist.org/packages/gowa-php/laravel)** — Laravel integration providing Facades, Notification Channels, Webhook routes, and Eloquent models.
+- **[whatsmeow](https://go.mau.fi/whatsmeow)** — Go library by [Tulir Asokan](https://github.com/tulir) that reverse engineers the WhatsApp Web Multi-Device protocol and Signal encryption.
+- **[go-whatsapp-web-multidevice (GOWA)](https://github.com/aldinokemal/go-whatsapp-web-multidevice)** — REST API server created by [Aldino Kemal](https://github.com/aldinokemal) wrapping `whatsmeow` with HTTP endpoints and webhooks.
+- **[gowa-php/sdk](https://packagist.org/packages/gowa-php/sdk)** — Pure PHP SDK for the GOWA REST API and webhook parsing.
+- **[gowa-php/laravel](https://packagist.org/packages/gowa-php/laravel)** — Laravel integration with Facades, Notification channels, Webhook routing, and Eloquent models.
 
 ---
 
 ## 📦 Prerequisites & Requirements
 
-* **Running GOWA Server**: An active instance of [go-whatsapp-web-multidevice (GOWA)](https://github.com/aldinokemal/go-whatsapp-web-multidevice). `GOWA_BASE_URL` is **required** in your `.env`.
+* **Running GOWA Server**: An active [go-whatsapp-web-multidevice (GOWA)](https://github.com/aldinokemal/go-whatsapp-web-multidevice) instance. `GOWA_BASE_URL` is **mandatory** in your `.env`.
 * **PHP**: `>= 8.2`
 * **Laravel**: `^10.0 | ^11.0 | ^12.0`
-* **Filament**: `^3.0 | ^4.0 | ^5.0`
+* **Filament**: `^4.0 | ^5.0`
 * **GOWA Packages**: `gowa-php/sdk ^1.0`, `gowa-php/laravel ^1.1`
 
 ---

@@ -60,10 +60,14 @@
             $initials = \Gowa\Filament\Pages\GowaConversationsPage::contactInitials($conversation->contact_name, $conversation->contact_phone);
             $avatarPalette = \Gowa\Filament\Pages\GowaConversationsPage::avatarBgColor($conversation->contact_phone ?: $conversation->contact_jid);
             $isActive = $selectedConversationId === $conversation->id;
-            $latestMessage = $conversation->messages->first();
+            $latestMessage = $conversation->latestMessage ?? $conversation->messages?->first();
         @endphp
         <div
+            role="button"
+            tabindex="0"
             wire:click="selectConversation({{ $conversation->id }})"
+            wire:keydown.enter="selectConversation({{ $conversation->id }})"
+            wire:keydown.space.prevent="selectConversation({{ $conversation->id }})"
             wire:key="conv-{{ $conversation->id }}"
             class="gowa-conv-item {{ $isActive ? 'is-active' : '' }}"
         >

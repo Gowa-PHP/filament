@@ -292,6 +292,12 @@ it('executes send using form data submitted from modal', function () {
 
 it('falls back to first open instance when device_id not specified', function () {
     \Gowa\Laravel\Models\GowaInstance::create([
+        'device_id' => 'device_disconnected',
+        'name'      => 'Offline Instance',
+        'status'    => 'close',
+    ]);
+
+    \Gowa\Laravel\Models\GowaInstance::create([
         'device_id' => 'device_auto_db',
         'name'      => 'Default Instance',
         'status'    => 'open',

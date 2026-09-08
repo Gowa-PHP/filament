@@ -381,7 +381,9 @@ class SendGowaAction extends Action
 
             if (empty($deviceId)) {
                 $modelClass = config('gowa-filament.model', GowaInstance::class);
-                $deviceId = (string) $modelClass::query()->value('device_id');
+                $deviceId = (string) $modelClass::query()
+                    ->whereIn('status', ['open', 'connected'])
+                    ->value('device_id');
             }
 
             if (empty($deviceId)) {

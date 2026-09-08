@@ -1,10 +1,10 @@
 # AGENTS.md — Guidelines for AI Coding Agents
 
 ## 📌 Project Overview
-`gowa-php/filament` is the official Filament v3/v4/v5 plugin for integrating GOWA WhatsApp instances into Laravel Filament applications.
+`gowa-php/filament` is the official Filament v4/v5 plugin for integrating GOWA WhatsApp instances into Laravel Filament applications.
 
 ### 🏗 Architecture & Stack
-- **Framework Compatibility**: PHP >= 8.2, Laravel 10/11/12, Filament v3/v4/v5.
+- **Framework Compatibility**: PHP >= 8.2, Laravel 10/11/12, Filament v4/v5.
 - **Dependencies**: `gowa-php/sdk`, `gowa-php/laravel`.
 - **Testing Engine**: Pest PHP 3 with `orchestra/testbench`.
 - **Autoload**: PSR-4 — `Gowa\Filament\` → `src/`, `Gowa\Filament\Tests\` → `tests/`.
@@ -49,9 +49,9 @@
 - Branch alias: `dev-main` → `1.x-dev` (defined in `composer.json` → `extra.branch-alias`).
 
 ### 🛠 Commandments for Agents
-1. **Compatibility**: Always preserve clean compatibility across PHP 8.2–8.4, Laravel 10–12, and Filament v3–v5.
+1. **Compatibility**: Always preserve clean compatibility across PHP 8.2–8.4, Laravel 10–12, and Filament v4–v5.
 2. **Testing**: Use Pest PHP for all tests (`vendor/bin/pest`). Never introduce PHPUnit syntax in tests.
 3. **Translations**: Keep translations up to date in both `en` and `pt_BR` (`resources/lang/en/gowa-filament.php` and `resources/lang/pt_BR/gowa-filament.php`).
 4. **Git Operations**: NEVER perform `git commit`, `git tag`, or `git push` without explicit user permission and confirmation.
 5. **Form Dehydration**: Non-column or calculated form fields (such as `webhook_url`) MUST include `->dehydrated(false)` to prevent Eloquent missing column database errors.
-6. **Cross-Version Filament Actions**: In form component actions/suffix actions, use `Filament\Actions\Action` and un-typehinted `$set` closure parameters (`function ($set)`) to ensure cross-version compatibility between Filament v3, v4, and v5.
+6. **Cross-Version Filament Actions**: In form component actions/suffix actions, use `Filament\Actions\Action` and un-typehinted `$set` closure parameters (`function ($set)`) to ensure cross-version compatibility between Filament v4 and v5.

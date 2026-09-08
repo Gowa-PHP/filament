@@ -12,8 +12,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
@@ -26,17 +24,14 @@ use Gowa\Sdk\Dto\ContactCard;
 use Gowa\Sdk\Dto\MediaPayload;
 use Gowa\Sdk\Dto\MediaType;
 use Gowa\Sdk\Dto\MediaUpload;
-use Gowa\Sdk\Dto\Presence;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\MessageBag;
 
-class GowaMessagingPage extends Page implements HasForms
+class GowaMessagingPage extends Page
 {
-    use InteractsWithForms;
-
     protected string $view = 'gowa-filament::pages.gowa-messaging-page';
 
     public ?array $data = [];
@@ -97,6 +92,11 @@ class GowaMessagingPage extends Page implements HasForms
         return __('gowa-filament::gowa-filament.messaging.subheading');
     }
 
+    public static function canAccess(): bool
+    {
+        return parent::canAccess();
+    }
+
     public function mount(): void
     {
         $modelClass = config('gowa-filament.model', GowaInstance::class);
@@ -110,7 +110,6 @@ class GowaMessagingPage extends Page implements HasForms
             'message_type'     => 'text',
             'is_voice'         => true,
             'selectable_count' => 1,
-            'presence_type'    => 'composing',
         ]);
     }
 
@@ -164,7 +163,6 @@ class GowaMessagingPage extends Page implements HasForms
                                 'location' => '📍 Localização (Location)',
                                 'link'     => '🔗 Link com Preview (Link)',
                                 'poll'     => '📊 Enquete (Poll)',
-                                'presence' => '📡 Status de Presença (Presence)',
                             ])
                             ->live()
                             ->required(),
@@ -313,18 +311,6 @@ class GowaMessagingPage extends Page implements HasForms
                                 ])
                                 ->default(1),
                         ])->visible(fn($get) => $get('message_type') === 'poll'),
-
-                        // Presence Fields
-                        Select::make('presence_type')
-                            ->label(__('gowa-filament::gowa-filament.fields.presence_type'))
-                            ->native(false)
-                            ->options([
-                                'composing' => '⌨️ Digitando... (Composing)',
-                                'recording' => '🎙️ Gravando áudio... (Recording)',
-                                'paused'    => '⏸️ Pausado (Paused)',
-                            ])
-                            ->default('composing')
-                            ->visible(fn($get) => $get('message_type') === 'presence'),
                     ]),
             ])
             ->statePath('data');
@@ -450,13 +436,11 @@ class GowaMessagingPage extends Page implements HasForms
                     ),
                 ),
 
-                'sticker' => Gowa::sendMedia(
+                'sticker' => Gowa::sendSticker(
                     $deviceId,
                     $to,
-                    new MediaPayload(
-                        type: MediaType::Sticker,
-                        upload: $this->resolveMediaUpload($data),
-                    ),
+                    $this->resolveMediaUpload($data),
+                    ! empty($data['reply_to']) ? (string) $data['reply_to'] : null,
                 ),
 
                 'contact' => Gowa::sendContacts(
@@ -482,15 +466,6 @@ class GowaMessagingPage extends Page implements HasForms
                     (string) $data['question'],
                     array_values(array_filter(array_column($data['poll_options'] ?? [], 'option_name'))),
                     (int) ($data['selectable_count'] ?? 1),
-                ),
-
-                'presence' => Gowa::setPresence(
-                    $deviceId,
-                    match ($data['presence_type'] ?? 'composing') {
-                        'recording' => Presence::Recording,
-                        'paused'    => Presence::Paused,
-                        default     => Presence::Composing,
-                    },
                 ),
 
                 default => throw new Exception("Tipo de mensagem '{$type}' não suportado."),
@@ -523,11 +498,10 @@ class GowaMessagingPage extends Page implements HasForms
                     ['option_name' => 'Tarde (13h - 18h)'],
                 ],
                 'selectable_count' => 1,
-                'presence_type'    => 'composing',
             ]);
 
             Notification::make()
-                ->title($type === 'presence' ? __('gowa-filament::gowa-filament.notifications.presence_updated') : __('gowa-filament::gowa-filament.notifications.message_sent'))
+                ->title(__('gowa-filament::gowa-filament.notifications.message_sent'))
                 ->success()
                 ->send();
         } catch (Exception $e) {

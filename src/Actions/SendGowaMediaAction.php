@@ -144,10 +144,10 @@ class SendGowaMediaAction extends Action
                 ->preserveFilenames()
                 ->imageEditor(fn() => $this->mediaType === MediaType::Image)
                 ->acceptedFileTypes(match ($this->mediaType) {
-                    MediaType::Image, MediaType::Sticker => ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-                    MediaType::Video                     => ['video/mp4', 'video/3gpp', 'video/quicktime', 'video/avi'],
-                    MediaType::Audio                     => ['audio/mp3', 'audio/ogg', 'audio/wav', 'audio/aac', 'audio/m4a'],
-                    default                              => null,
+                    MediaType::Image => ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+                    MediaType::Video => ['video/mp4', 'video/3gpp', 'video/quicktime', 'video/avi'],
+                    MediaType::Audio => ['audio/mp3', 'audio/ogg', 'audio/wav', 'audio/aac', 'audio/m4a'],
+                    default          => null,
                 });
         }
 

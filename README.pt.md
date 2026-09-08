@@ -3,14 +3,14 @@
 
   # gowa-php/filament
 
-  **Plugin Filament v5 / v4 / v3 para integração de instâncias WhatsApp GOWA em aplicações Laravel Filament**
+  **Plugin Filament v5 / v4 para integração de instâncias WhatsApp GOWA em aplicações Laravel Filament**
 
   [![Última Versão](https://img.shields.io/packagist/v/gowa-php/filament.svg?style=flat-square)](https://packagist.org/packages/gowa-php/filament)
   [![Total de Downloads](https://img.shields.io/packagist/dt/gowa-php/filament.svg?style=flat-square)](https://packagist.org/packages/gowa-php/filament)
   [![Licença](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
   [![Versão PHP](https://img.shields.io/badge/PHP-%3E%3D%208.2-777BB4.svg?style=flat-square)](https://php.net)
   [![Laravel](https://img.shields.io/badge/Laravel-10%20|%2011%20|%2012-FF2D20.svg?style=flat-square)](https://laravel.com)
-  [![Filament](https://img.shields.io/badge/Filament-v3%20|%20v4%20|%20v5-FDAE4B.svg?style=flat-square)](https://filamentphp.com)
+  [![Filament](https://img.shields.io/badge/Filament-v4%20|%20v5-FDAE4B.svg?style=flat-square)](https://filamentphp.com)
 
 </div>
 
@@ -36,7 +36,7 @@ Este pacote é a Fase 3 do ecossistema GOWA PHP e interage com o ecossistema ope
 * **Servidor GOWA em Execução**: Uma instância ativa do [go-whatsapp-web-multidevice (GOWA)](https://github.com/aldinokemal/go-whatsapp-web-multidevice). A variável `GOWA_BASE_URL` é **obrigatória** no seu arquivo `.env`.
 * **PHP**: `>= 8.2`
 * **Laravel**: `^10.0 | ^11.0 | ^12.0`
-* **Filament**: `^3.0 | ^4.0 | ^5.0`
+* **Filament**: `^4.0 | ^5.0`
 * **Pacotes GOWA**: `gowa-php/sdk ^1.0`, `gowa-php/laravel ^1.1`
 
 ---

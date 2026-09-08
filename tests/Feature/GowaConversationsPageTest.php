@@ -282,3 +282,34 @@ it('automatically marks inbound messages as read when opening conversation', fun
     expect($message->fresh()->read_at)->not->toBeNull()
         ->and($message->fresh()->status)->toBe(\Gowa\Laravel\Enums\GowaMessageStatus::Read);
 });
+
+it('resolves latest message by sent_at as primary ordering', function () {
+    // Newer message inserted first
+    GowaMessage::create([
+        'instance_id'     => $this->instance->id,
+        'conversation_id' => $this->conversation->id,
+        'message_id'      => 'MSG_NEWER',
+        'direction'       => 'inbound',
+        'status'          => 'delivered',
+        'type'            => 'text',
+        'body'            => 'Newer message',
+        'sent_at'         => now()->subMinute(),
+    ]);
+
+    // Older message inserted afterwards (higher id, older sent_at)
+    GowaMessage::create([
+        'instance_id'     => $this->instance->id,
+        'conversation_id' => $this->conversation->id,
+        'message_id'      => 'MSG_OLDER',
+        'direction'       => 'inbound',
+        'status'          => 'delivered',
+        'type'            => 'text',
+        'body'            => 'Older message',
+        'sent_at'         => now()->subHour(),
+    ]);
+
+    $conversation = GowaConversation::with('latestMessage')->find($this->conversation->id);
+
+    expect($conversation->latestMessage)->not->toBeNull()
+        ->and($conversation->latestMessage->message_id)->toBe('MSG_NEWER');
+});
