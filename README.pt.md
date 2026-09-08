@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="art/gowa-filament-cover.png" alt="gowa-filament Banner" width="100%" max-width="800">
+  <img class="filament-hidden" src="art/gowa-filament-cover.png" alt="gowa-filament Banner" width="100%" max-width="800">
 
   # gowa-php/filament
 
