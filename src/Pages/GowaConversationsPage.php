@@ -109,7 +109,32 @@ class GowaConversationsPage extends Page
 
     public static function canAccess(): bool
     {
-        return parent::canAccess();
+        if (! parent::canAccess()) {
+            return false;
+        }
+
+        try {
+            $plugin = filament()->getPlugin('gowa-filament');
+        } catch (\Throwable) {
+            // Plugin not registered or outside panel context
+            return true;
+        }
+
+        if ($plugin instanceof \Gowa\Filament\GowaPlugin) {
+            try {
+                $callback = $plugin->getConversationsAuthorizationCallback();
+
+                if ($callback) {
+                    return (bool) app()->call($callback);
+                }
+            } catch (\Throwable $e) {
+                report($e);
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function mount(): void
@@ -147,20 +172,20 @@ class GowaConversationsPage extends Page
                 try {
                     $avatar = Gowa::avatar($instance->device_id, $instance->phone_number);
 
-                    return $avatar?->url;
+                    return $avatar?->url ?: '__none__';
                 } catch (\Throwable) {
-                    return null;
+                    return '__none__';
                 }
             });
 
-            if ($cached) {
+            if ($cached && $cached !== '__none__') {
                 return $cached;
             }
         }
 
-        $name = $instance->name ?: $instance->device_id ?: 'WA';
+        $initials = static::contactInitials($instance->name, $instance->device_id);
 
-        return 'https://ui-avatars.com/api/?name=' . urlencode((string) $name) . '&color=128C7E&background=DCF8C6';
+        return 'https://ui-avatars.com/api/?name=' . urlencode((string) ($initials ?: 'WA')) . '&color=128C7E&background=DCF8C6';
     }
 
     public function form(Schema $schema): Schema
@@ -372,10 +397,8 @@ class GowaConversationsPage extends Page
                 ]);
 
                 $conversation->update(['last_message_at' => now()]);
-            } catch (\Throwable $localDbException) {
-                Log::warning('GOWA local message persistence warning: ' . $localDbException->getMessage(), [
-                    'exception' => $localDbException,
-                ]);
+            } catch (\Throwable) {
+                Log::warning('GOWA local message persistence failed.');
             }
 
             Notification::make()
@@ -514,10 +537,8 @@ class GowaConversationsPage extends Page
                 ]);
 
                 $conversation->update(['last_message_at' => now()]);
-            } catch (\Throwable $localDbException) {
-                Log::warning('GOWA local attachment persistence warning: ' . $localDbException->getMessage(), [
-                    'exception' => $localDbException,
-                ]);
+            } catch (\Throwable) {
+                Log::warning('GOWA local attachment persistence failed.');
             }
 
             Notification::make()
@@ -558,32 +579,35 @@ class GowaConversationsPage extends Page
             $unreadMessages = GowaMessage::where('conversation_id', $targetId)
                 ->where('direction', GowaMessageDirection::Inbound->value)
                 ->whereNull('read_at')
+                ->take(20)
                 ->get();
 
-            // 1. Always mark as read locally in database first
-            if ($unreadMessages->isNotEmpty()) {
-                GowaMessage::where('conversation_id', $targetId)
-                    ->where('direction', GowaMessageDirection::Inbound->value)
-                    ->whereNull('read_at')
-                    ->update([
-                        'read_at' => now(),
-                        'status'  => GowaMessageStatus::Read->value,
-                    ]);
-            }
+            $markedIds = [];
 
-            // 2. Call GOWA API for external WhatsApp read receipts (capped to prevent request timeouts)
-            if ($conversation->instance) {
-                foreach ($unreadMessages->take(20) as $message) {
-                    try {
+            // Call GOWA API for external WhatsApp read receipts (capped to batch size)
+            foreach ($unreadMessages as $message) {
+                try {
+                    if ($conversation->instance && $message->message_id) {
                         Gowa::markRead(
                             $conversation->instance->device_id,
                             $conversation->contact_jid,
                             $message->message_id,
                         );
-                    } catch (\Throwable $e) {
-                        Log::warning("Could not send read receipt to GOWA for message {$message->message_id}: " . $e->getMessage());
                     }
+
+                    $markedIds[] = $message->id;
+                } catch (\Throwable $e) {
+                    Log::warning("Could not send read receipt to GOWA for message {$message->message_id}: " . $e->getMessage());
                 }
+            }
+
+            // Mark only the successfully processed batch as read locally in database
+            if (! empty($markedIds)) {
+                GowaMessage::whereIn('id', $markedIds)
+                    ->update([
+                        'read_at' => now(),
+                        'status'  => GowaMessageStatus::Read->value,
+                    ]);
             }
 
             if ($notify) {

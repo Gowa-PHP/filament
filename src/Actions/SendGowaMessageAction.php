@@ -129,7 +129,7 @@ class SendGowaMessageAction extends Action
             return $record?->phone_number ?? $record?->phone ?? null;
         }
 
-        if (is_callable($this->numberResolver)) {
+        if ($this->numberResolver instanceof Closure) {
             return (string) call_user_func($this->numberResolver, $record);
         }
 
@@ -150,7 +150,7 @@ class SendGowaMessageAction extends Action
             return null;
         }
 
-        if (is_callable($this->instanceResolver)) {
+        if ($this->instanceResolver instanceof Closure) {
             return (string) call_user_func($this->instanceResolver, $record);
         }
 
@@ -163,7 +163,7 @@ class SendGowaMessageAction extends Action
             return null;
         }
 
-        if (is_callable($this->messageText)) {
+        if ($this->messageText instanceof Closure) {
             return (string) call_user_func($this->messageText, $record);
         }
 

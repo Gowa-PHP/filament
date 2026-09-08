@@ -59,7 +59,18 @@ class SendGowaDocumentAction extends Action
 
     public function document(mixed $file, string|Closure|null $filename = null): static
     {
-        if (is_string($file) && filter_var($file, FILTER_VALIDATE_URL)) {
+        if ($file instanceof Closure) {
+            $this->documentUrl(function (?Model $record) use ($file) {
+                $val = call_user_func($file, $record);
+
+                return (is_string($val) && filter_var($val, FILTER_VALIDATE_URL)) ? $val : null;
+            });
+            $this->documentFile(function (?Model $record) use ($file) {
+                $val = call_user_func($file, $record);
+
+                return (is_string($val) && filter_var($val, FILTER_VALIDATE_URL)) ? null : $val;
+            });
+        } elseif (is_string($file) && filter_var($file, FILTER_VALIDATE_URL)) {
             $this->documentUrl($file);
         } else {
             $this->documentFile($file);
@@ -100,6 +111,11 @@ class SendGowaDocumentAction extends Action
     {
         $this->documentFileResolver = $columnOrClosure;
         return $this;
+    }
+
+    public function documentFile(string|Closure $columnOrClosure): static
+    {
+        return $this->documentFrom($columnOrClosure);
     }
 
     public function documentUrl(string|Closure $urlOrClosure): static
@@ -183,7 +199,7 @@ class SendGowaDocumentAction extends Action
             return $record?->phone_number ?? $record?->phone ?? null;
         }
 
-        if (is_callable($this->numberResolver)) {
+        if ($this->numberResolver instanceof Closure) {
             return (string) call_user_func($this->numberResolver, $record);
         }
 
@@ -204,7 +220,7 @@ class SendGowaDocumentAction extends Action
             return null;
         }
 
-        if (is_callable($this->instanceResolver)) {
+        if ($this->instanceResolver instanceof Closure) {
             return (string) call_user_func($this->instanceResolver, $record);
         }
 
@@ -217,7 +233,7 @@ class SendGowaDocumentAction extends Action
             return null;
         }
 
-        if (is_callable($this->documentUrlResolver)) {
+        if ($this->documentUrlResolver instanceof Closure) {
             return (string) call_user_func($this->documentUrlResolver, $record);
         }
 
@@ -234,7 +250,7 @@ class SendGowaDocumentAction extends Action
             return null;
         }
 
-        if (is_callable($this->filenameResolver)) {
+        if ($this->filenameResolver instanceof Closure) {
             return (string) call_user_func($this->filenameResolver, $record);
         }
 
@@ -291,7 +307,7 @@ class SendGowaDocumentAction extends Action
         } elseif (! empty($data['document_url'])) {
             $mediaPath = trim((string) $data['document_url']);
         } elseif ($this->documentFileResolver !== null && $record !== null) {
-            $resolvedFile = is_callable($this->documentFileResolver)
+            $resolvedFile = $this->documentFileResolver instanceof Closure
                 ? call_user_func($this->documentFileResolver, $record)
                 : data_get($record, $this->documentFileResolver);
 
@@ -331,7 +347,8 @@ class SendGowaDocumentAction extends Action
 
             if (empty($deviceId)) {
                 $modelClass = config('gowa-filament.model', GowaInstance::class);
-                $deviceId = $modelClass::query()->value('device_id');
+                $deviceId = (string) ($modelClass::query()->whereIn('status', ['open', 'connected'])->value('device_id')
+                    ?? $modelClass::query()->value('device_id'));
             }
 
             if (empty($deviceId)) {

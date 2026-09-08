@@ -173,7 +173,7 @@ class SendGowaMediaAction extends Action
             return $record?->phone_number ?? $record?->phone ?? null;
         }
 
-        if (is_callable($this->numberResolver)) {
+        if ($this->numberResolver instanceof Closure) {
             return (string) call_user_func($this->numberResolver, $record);
         }
 
@@ -194,7 +194,7 @@ class SendGowaMediaAction extends Action
             return null;
         }
 
-        if (is_callable($this->instanceResolver)) {
+        if ($this->instanceResolver instanceof Closure) {
             return (string) call_user_func($this->instanceResolver, $record);
         }
 
@@ -207,7 +207,7 @@ class SendGowaMediaAction extends Action
             return null;
         }
 
-        if (is_callable($this->mediaUrlResolver)) {
+        if ($this->mediaUrlResolver instanceof Closure) {
             return (string) call_user_func($this->mediaUrlResolver, $record);
         }
 
@@ -224,7 +224,7 @@ class SendGowaMediaAction extends Action
             return null;
         }
 
-        if (is_callable($this->captionTextResolver)) {
+        if ($this->captionTextResolver instanceof Closure) {
             return (string) call_user_func($this->captionTextResolver, $record);
         }
 
@@ -281,7 +281,7 @@ class SendGowaMediaAction extends Action
         } elseif (! empty($data['media_url'])) {
             $mediaPath = trim((string) $data['media_url']);
         } elseif ($this->mediaFileResolver !== null && $record !== null) {
-            $resolvedFile = is_callable($this->mediaFileResolver)
+            $resolvedFile = $this->mediaFileResolver instanceof Closure
                 ? call_user_func($this->mediaFileResolver, $record)
                 : data_get($record, $this->mediaFileResolver);
 

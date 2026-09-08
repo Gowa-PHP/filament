@@ -111,6 +111,7 @@
         class="gowa-chat-messages"
         wire:poll.4s
         x-data="{
+            observer: null,
             scrollToBottom() {
                 this.$nextTick(() => {
                     if (this.$refs.chatContainer) {
@@ -120,8 +121,21 @@
             },
             init() {
                 this.scrollToBottom();
-                const observer = new MutationObserver(() => this.scrollToBottom());
-                observer.observe(this.$refs.chatContainer, { childList: true, subtree: true });
+                this.observer = new MutationObserver(() => {
+                    const el = this.$refs.chatContainer;
+                    if (el) {
+                        const isNearBottom = (el.scrollHeight - el.scrollTop - el.clientHeight) < 120;
+                        if (isNearBottom) {
+                            this.scrollToBottom();
+                        }
+                    }
+                });
+                this.observer.observe(this.$refs.chatContainer, { childList: true, subtree: true });
+            },
+            destroy() {
+                if (this.observer) {
+                    this.observer.disconnect();
+                }
             }
         }"
         x-ref="chatContainer"
