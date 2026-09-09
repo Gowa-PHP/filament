@@ -8,8 +8,8 @@
   [![Latest Version](https://img.shields.io/packagist/v/gowa-php/filament.svg?style=flat-square)](https://packagist.org/packages/gowa-php/filament)
   [![Total Downloads](https://img.shields.io/packagist/dt/gowa-php/filament.svg?style=flat-square)](https://packagist.org/packages/gowa-php/filament)
   [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
-  [![PHP Version](https://img.shields.io/badge/PHP-%3E%3D%208.2-777BB4.svg?style=flat-square)](https://php.net)
-  [![Laravel](https://img.shields.io/badge/Laravel-10%20%7C%2011%20%7C%2012-FF2D20.svg?style=flat-square)](https://laravel.com)
+  [![PHP Version](https://img.shields.io/badge/PHP-%3E%3D%208.3-777BB4.svg?style=flat-square)](https://php.net)
+  [![Laravel](https://img.shields.io/badge/Laravel-10%20%7C%2011%20%7C%2012%20%7C%2013-FF2D20.svg?style=flat-square)](https://laravel.com)
   [![Filament](https://img.shields.io/badge/Filament-v4%20|%20v5-FDAE4B.svg?style=flat-square)](https://filamentphp.com)
   [![Plumb Score](https://plumbphp.dev/badges/gowa-php/filament/composite.svg?style=flat-square)](https://plumbphp.dev/gowa-php/filament)
 
@@ -35,8 +35,8 @@ This package is part of the GOWA PHP ecosystem and builds upon the open-source G
 ## 📦 Prerequisites & Requirements
 
 * **Running GOWA Server**: An active [go-whatsapp-web-multidevice (GOWA)](https://github.com/aldinokemal/go-whatsapp-web-multidevice) instance. `GOWA_BASE_URL` is **mandatory** in your `.env`.
-* **PHP**: `>= 8.2`
-* **Laravel**: `^10.0 | ^11.0 | ^12.0`
+* **PHP**: `>= 8.3`
+* **Laravel**: `^10.0 | ^11.0 | ^12.0 | ^13.0`
 * **Filament**: `^4.0 | ^5.0`
 * **GOWA Packages**: `gowa-php/sdk ^1.0`, `gowa-php/laravel ^1.1`
 
