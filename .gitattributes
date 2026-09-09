@@ -1,0 +1,22 @@
+# Git configuration
+* text=auto eol=lf
+
+# Export ignore for lean release archives (Plumb / Composer hygiene)
+/.ai-memory.toml         export-ignore
+/.coderabbit.yaml        export-ignore
+/.editorconfig           export-ignore
+/.gitattributes          export-ignore
+/.github                 export-ignore
+/.gitignore              export-ignore
+/.php-cs-fixer.cache     export-ignore
+/.php-cs-fixer.dist.php  export-ignore
+/.phpunit.cache          export-ignore
+/.serena                 export-ignore
+/AGENTS.md               export-ignore
+/CODE_OF_CONDUCT.md      export-ignore
+/CONTRIBUTING.md         export-ignore
+/art                     export-ignore
+/composer.lock           export-ignore
+/examples                export-ignore
+/phpunit.xml             export-ignore
+/tests                   export-ignore
