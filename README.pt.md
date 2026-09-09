@@ -9,7 +9,7 @@
   [![Total de Downloads](https://img.shields.io/packagist/dt/gowa-php/filament.svg?style=flat-square)](https://packagist.org/packages/gowa-php/filament)
   [![Licença](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
   [![Versão PHP](https://img.shields.io/badge/PHP-%3E%3D%208.2-777BB4.svg?style=flat-square)](https://php.net)
-  [![Laravel](https://img.shields.io/badge/Laravel-10%20|%2011%20|%2012-FF2D20.svg?style=flat-square)](https://laravel.com)
+  [![Laravel](https://img.shields.io/badge/Laravel-10%20%7C%2011%20%7C%2012-FF2D20.svg?style=flat-square)](https://laravel.com)
   [![Filament](https://img.shields.io/badge/Filament-v4%20|%20v5-FDAE4B.svg?style=flat-square)](https://filamentphp.com)
   [![Pontuação Plumb](https://plumbphp.dev/badges/gowa-php/filament/composite.svg?style=flat-square)](https://plumbphp.dev/gowa-php/filament)
 
