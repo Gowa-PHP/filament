@@ -22,7 +22,7 @@
 
 ## ⚡ Agradecimentos e Dependências do Ecossistema
 
-Este pacote é a Fase 3 do ecossistema GOWA PHP e interage com o ecossistema open-source em Go:
+Este pacote faz parte do ecossistema GOWA PHP e interage com o ecossistema open-source em Go:
 
 - **[whatsmeow](https://go.mau.fi/whatsmeow)** — Biblioteca Go desenvolvida por [Tulir Asokan](https://github.com/tulir) que realiza a engenharia reversa do protocolo WebSocket do WhatsApp Web Multi-Device e criptografia Signal.
 - **[go-whatsapp-web-multidevice (GOWA)](https://github.com/aldinokemal/go-whatsapp-web-multidevice)** — Servidor REST API criado por [Aldino Kemal](https://github.com/aldinokemal) expondo o `whatsmeow` via HTTP e Webhooks.
@@ -57,19 +57,19 @@ php artisan vendor:publish --tag="gowa-filament-config"
 
 ---
 
-## ⚙️ Configuração do Ambiente (`.env`)
+## ⚙️ Configuração de Ambiente (`.env`)
 
 Adicione as credenciais de conexão do servidor GOWA ao seu arquivo `.env`:
 
 ```env
-# Conexão com o Servidor WhatsApp GOWA
+# Conexão com o servidor GOWA WhatsApp
 GOWA_BASE_URL=https://gowa.suaempresa.com
 GOWA_USERNAME=admin
 GOWA_PASSWORD=secret
 GOWA_TIMEOUT=15
 
-# Configuração de Webhook (Opcional)
-GOWA_WEBHOOK_SECRET=sua_secret_hmac
+# Configurações do Webhook (Opcional)
+GOWA_WEBHOOK_SECRET=seu_segredo_hmac
 GOWA_WEBHOOK_PATH=webhooks/gowa
 ```
 
@@ -77,7 +77,7 @@ GOWA_WEBHOOK_PATH=webhooks/gowa
 
 ## ⚡ Início Rápido
 
-Adicione o `GowaPlugin` ao seu Provider de Painel do Filament (ex: `AdminPanelProvider.php`):
+Adicione o `GowaPlugin` ao seu Filament Panel Provider (por exemplo, `AdminPanelProvider.php`):
 
 ```php
 use Gowa\Filament\GowaPlugin;
@@ -103,7 +103,7 @@ public function panel(Panel $panel): Panel
 - **🔗 Sincronização de Webhook & Gerador de Secret**: Sincronize a URL do webhook e o segredo HMAC diretamente com o servidor GOWA Go sem desconectar. Inclui ação com gerador de segredo aleatório de 32 caracteres.
 - **📷 Modal com QR Code em Tempo Real**: Escaneie o QR Code diretamente no Filament com polling automático (`wire:poll.3s`).
 - **🔢 Modal de Pareamento via Código de 8 Dígitos**: Conecte o WhatsApp informando o número de telefone com cópia do código com um clique.
-- **🧪 Playground de Teste de Mensagens (`GowaMessagingPage`)**: Central interativa com suporte aos 11 formatos de mensagens do GOWA:
+- **🧪 Playground de Teste de Mensagens (`GowaMessagingPage`)**: Central interativa com suporte aos 10 formatos de mensagens do GOWA:
   - 💬 **Texto**: Mensagens de texto puro com suporte a resposta direcionada (reply).
   - 🖼️ **Imagem**: Upload de imagem com o Editor Nativo de Imagens do Filament (cortar, rotacionar, inverter).
   - 🎥 **Vídeo**: Upload de vídeos (`.mp4`, `.avi`, `.mov`).
@@ -114,7 +114,6 @@ public function panel(Panel $panel): Panel
   - 📍 **Localização**: Envio de coordenadas GPS com nome do local e endereço.
   - 🔗 **Preview de Link**: Envio de links com preview Open-Graph automático.
   - 📊 **Enquete**: Criação de enquetes interativas com múltiplas opções.
-  - 📡 **Status de Presença**: Atualização do status digitando (`composing`) ou gravando (`recording`).
 - **⚡ Actions Fluentes e Facade**: Envio intuitivo e expressivo de mensagens com encadeamento de métodos, seja via Facade Fluente do Laravel (`Gowa::to()->from()->text()->send()`) ou através da Action nativa do Filament (`SendGowaAction::make()->to()->from()->text()->direct()`). Suporta disparo direto no clique ou revisão em modal interativo.
 - **✉️ Ações Especializadas para Recursos**:
   - `SendGowaAction`: Action fluente unificada compatível com texto, imagens, vídeos, áudio, notas de voz, documentos, enquetes, contatos, localizações e callbacks fluentes customizados.

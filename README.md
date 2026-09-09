@@ -22,7 +22,7 @@
 
 ## ⚡ Acknowledgements & Ecosystem Dependencies
 
-This package is Phase 3 of the GOWA PHP ecosystem and builds upon the open-source Go ecosystem:
+This package is part of the GOWA PHP ecosystem and builds upon the open-source Go ecosystem:
 
 - **[whatsmeow](https://go.mau.fi/whatsmeow)** — Go library by [Tulir Asokan](https://github.com/tulir) that reverse engineers the WhatsApp Web Multi-Device protocol and Signal encryption.
 - **[go-whatsapp-web-multidevice (GOWA)](https://github.com/aldinokemal/go-whatsapp-web-multidevice)** — REST API server created by [Aldino Kemal](https://github.com/aldinokemal) wrapping `whatsmeow` with HTTP endpoints and webhooks.
@@ -103,7 +103,7 @@ public function panel(Panel $panel): Panel
 - **🔗 Webhook Synchronization & Secret Generator**: Synchronize webhook URLs and HMAC secrets directly with the GOWA Go server without disconnecting. Includes a 32-character random secret generator action.
 - **📷 Real-Time QR Code Modal**: Scan QR codes directly in Filament with automatic polling (`wire:poll.3s`).
 - **🔢 8-Digit Pairing Code Modal**: Link WhatsApp using a phone number with copy-to-clipboard pairing code.
-- **🧪 Messaging Test Sandbox (`GowaMessagingPage`)**: Interactive playground supporting all 11 GOWA message formats:
+- **🧪 Messaging Test Sandbox (`GowaMessagingPage`)**: Interactive playground supporting all 10 GOWA message formats:
   - 💬 **Text**: Plain text messages with reply targeting.
   - 🖼️ **Image**: Image upload with native Filament Image Editor (crop, rotate, flip).
   - 🎥 **Video**: Video file uploads (`.mp4`, `.avi`, `.mov`).
@@ -114,7 +114,6 @@ public function panel(Panel $panel): Panel
   - 📍 **Location**: Share GPS coordinates with location names and addresses.
   - 🔗 **Link Preview**: Send links with automated open-graph previews.
   - 📊 **Poll**: Interactive multi-option voting polls.
-  - 📡 **Presence Status**: Update typing (`composing`) or recording (`recording`) status.
 - **⚡ Fluent WhatsApp Actions & Facade**: Send messages intuitively using either the Laravel Fluent Facade (`Gowa::to()->from()->text()->send()`) or the dedicated Filament Action (`SendGowaAction::make()->to()->from()->text()->direct()`). Supports both direct one-click execution and interactive modal review.
 - **✉️ Specialized Resource Actions**:
   - `SendGowaAction`: Unified fluent action supporting text, images, videos, audio, voice notes, documents, polls, contacts, locations, and custom fluent closures.
