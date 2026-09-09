@@ -6,11 +6,13 @@ labels: 'bug'
 assignees: ''
 ---
 
-### Describe the Bug
+## Describe the Bug
 
 A clear and concise description of what the bug is.
 
-### Steps to Reproduce
+Do not include secrets or personal data. For security vulnerabilities, use the private reporting channels documented in [SECURITY.md](../../SECURITY.md).
+
+## Steps to Reproduce
 
 Steps to reproduce the behavior:
 1. Go to '...'
@@ -18,21 +20,21 @@ Steps to reproduce the behavior:
 3. Scroll down to '....'
 4. See error
 
-### Expected Behavior
+## Expected Behavior
 
 A clear and concise description of what you expected to happen.
 
-### Code Sample / Configuration
+## Code Sample / Configuration
 
 ```php
 // Your Filament resource, page, action, or plugin configuration
 ```
 
-### Screenshots or Video
+## Screenshots or Video
 
 If applicable, add screenshots or video to help explain the problem.
 
-### Environment
+## Environment
 
 - **PHP Version**: `8.2` / `8.3` / `8.4`
 - **Laravel Version**: `10.x` / `11.x` / `12.x`
@@ -40,6 +42,6 @@ If applicable, add screenshots or video to help explain the problem.
 - **gowa-php/filament Version**: `1.x`
 - **GOWA Server Version**: `v...`
 
-### Additional Context
+## Additional Context
 
 Add any other context, browser details, or stack trace logs about the problem here.
